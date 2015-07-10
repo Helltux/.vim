@@ -1,0 +1,636 @@
+*usr_08.txt*	Für Vim Version 7.4.  Letzte Änderung: 2006-Jul-18
+
+		     VIM BENUTZERHANDBUCH - von Bram Moolenaar
+
+			      Fenster aufteilen
+
+
+Zwei verschiedene Datei übereinander anzeigen.  Oder zwei verschiedene
+Stellen in einer Datei zur gleichen Zeit.  Sehen Sie die Unterschiede
+zwischen zwei Dateien, indem Sie sie Seite an Seite setzen.  All dies ist
+möglich mit geteilten Fenstern.
+
+|08.1|	Ein Fenster aufteilen
+|08.2|	Ein Fenster auf eine andere Datei aufteilen
+|08.3|	Fenstergröße
+|08.4|	Vertikales Aufteilen
+|08.5|	Fenster bewegen
+|08.6|	Befehle für alle Fenster
+|08.7|	Unterschiede mit »vimdiff« betrachten
+|08.8|	Verschiedenes
+
+Nächstes Kapitel: |usr_09.txt|  Die GUI benutzen
+ Voriges Kapitel: |usr_07.txt|  Mehr als eine Datei editieren
+Inhaltsübersicht: |usr_toc.txt|
+
+==============================================================================
+*08.1*	Ein Fenster aufteilen
+
+Der einfachste Weg, ein neues Fenster zu öffnen, ist es, den folgenden
+Befehl zu benutzen: >
+
+	:split
+
+Dieser Befehl teilt den Bildschirm in zwei Fenster und lässt den Cursor in
+dem oberen:
+
+	+----------------------------------+
+	|/* Datei eins.c */		   |
+	|~				   |
+	|~				   |
+	|eins.c============================|
+	|/* Datei eins.c */		   |
+	|~				   |
+	|eins.c============================|
+	|				   |
+	+----------------------------------+
+
+Was Sie hier sehen, sind zwei Fenster auf derselben Datei.  Die Zeile mit
+»====« ist die Status-Zeile.  Sie zeigt Informationen über das Fenster
+oberhalb an. (in der Praxis ist die Status-Zeile in inverser Darstellung.)
+   Die beiden Fenster erlauben Ihnen, zwei Teile derselben Datei zu
+betrachten.  Zum Beispiel könnten Sie in dem oberen Fenster die Variablen-
+Deklaration eines Programms anzeigen lassen und in dem unteren den Kode der
+diese Variablen benutzt.
+
+Der Befehl CTRL-W w kann benutzt werden, um zwischen den Fenstern hin und
+her zu springen.  Wenn Sie in dem obersten Fenster sind, springt CTRL-W w in
+das Fenster unterhalb.  Wenn Sie in dem untersten Fenster sind, springt er
+in das erste Fenster. (CTRL-W CTRL-W macht dasselbe, falls Sie die
+Strg-Taste ein wenig länger halten.)
+
+
+DAS FENSTER SCHLIEßEN
+
+Um ein Fenster zu schließen, benutzen Sie den Befehl: >
+
+	:close
+
+Tatsächlich funktioniert jeder Befehl, der das Editieren einer Datei
+beendet, wie »:quit« und »ZZ«.  Aber »:close« bewahrt Sie davor, aus
+Versehen Vim zu beenden, wenn Sie das letzte Fenster schließen.
+
+
+ALLE ANDEREN FENSTER SCHLIEßEN
+
+Falls Sie eine ganze Reihe von Fenster geöffnet haben, sich aber nun auf
+eines von ihnen konzentrieren wollen, ist dieser Befehl nützlich: >
+
+	:only
+
+Dies schließt alle Fenster, außer dem aktuellen.  Falls irgendeines der
+anderen Fenster Änderungen hat, erhalten Sie eine Fehlermeldung, und das
+Fenster wird nicht geschlossen
+
+==============================================================================
+*08.2*	Ein Fenster auf eine andere Datei aufteilen
+
+Der folgende Befehl öffnet ein zweites Fenster und beginnt die gegebene Datei
+zu editieren: >
+
+	:split zwei.c
+
+Falls Sie zuvor eins.c editiert haben, sieht das Resultat etwa so aus:
+
+	+----------------------------------+
+	|/* Datei zwei.c */		   |
+	|~				   |
+	|~				   |
+	|zwei.c============================|
+	|/* Datei eins.c */		   |
+	|~				   |
+	|eins.c============================|
+	|				   |
+	+----------------------------------+
+
+Um ein Fenster mit einer neuen, leeren Datei zu öffnen, benutzen Sie dies:
+>
+
+	:new
+
+Sie können die Befehle »:split« und »:new« wiederholen, um so viele
+Fenster zu erzeugen, wie Sie wollen.
+
+==============================================================================
+*08.3*	Fenstergröße
+
+Der Befehl »:split« kann als Argument eine Zahl nehmen.  Falls angegeben,
+ist dies die Höhe des neuen Fensters.  Zum Beispiel öffnet das folgende
+ein neues Fenster, das drei Zeilen hoch ist, und beginnt die Datei alpha.c
+zu editieren: >
+
+	:3split alpha.c
+
+Bei bestehenden Fenstern können Sie auf mehrere Arten die Größe ändern.
+Wenn Sie eine funktionierende Maus haben, ist es einfach: bewegen Sie den
+Mauszeiger auf die Status-Zeile, die zwei Fenster trennt, und ziehen Sie sie
+rauf oder runter.
+
+Um die Größe eines Fensters zu erhöhen: >
+
+	CTRL-W +
+
+Um sie zu veringern: >
+
+	CTRL-W -
+
+Beide Befehle nehmen eine Anzahl und erhöhen oder verringern die
+Fenstergröße um so viele Zeile.  Also macht »4 CTRL-W +« das Fenster
+vier Zeilen höher.
+
+Um die Fensterhöhe auf eine bestimmte Anzahl Zeilen zu setzen: >
+
+	{hoehe}CTRL-W _
+
+Das ist eine Anzahl {hoehe}, CTRL-W und dann ein Unterstrich (Umschalttaste -
+Minus auf deutschen Tastaturen).
+   Um ein Fenster so hoch wie möglich zu machen, benutzen Sie den Befehl
+»CTRL-W _« ohne eine Anzahl.
+
+
+DIE MAUS BENUTZEN
+
+In Vim können Sie viele Dinge sehr schnell mit der Tastatur erledigen.
+Unglücklicherweise erfordern die Befehle zu Fenstergrößen-Änderung
+einiges Tippen.  In diesem Falle ist die Maus schneller.  Positionieren Sie
+den Mauszeiger auf einer Status-Zeile.  Nun drücken Sie den linken
+Mausknopf und ziehen.  Die Statuszeile bewegt sich und macht damit das
+Fenster auf einer Seite größer und das andere kleiner.
+
+
+OPTIONEN
+
+Die Option 'winheigt' kann auf die minimal erwünschte Höhe eines Fensters
+gesetzt werden und 'winminheigt' auf eine harte minimale Höhe.
+   Analog gibt es 'winwidth' für die minimal erwünschte Breite und
+'winminwidth' für die harte minimale Breite.
+   Die gesetzte Option 'equalalways' lässt Vim die Fenstergrößen gleich
+machen, wenn ein Fenster geschlossen oder geöffnet wird.
+
+==============================================================================
+*08.4*	Vertikales Aufteilen
+
+Der Befehl »:split« erzeugt das neue Fenster über dem aktuellen.  Um das
+Fenster links erscheinen zu lassen, benutzen Sie: >
+
+	:vsplit
+
+oder: >
+
+	:vsplit zwei.c
+
+Das Ergebnis sieht etwa so aus:
+
+	+--------------------------------------+
+	|/* Datei zwei.c */ |/* Datei eins.c */|
+	|~		    |~		       |
+	|~		    |~		       |
+	|~		    |~		       |
+	|zwei.c==============eins.c============|
+	|				       |
+	+--------------------------------------+
+
+Tatsächlich werden die |-Linien in der Mitte in inverser Darstellung sein.
+Dies heißt der vertikale Trenner.  Er trennt die beiden Fenster links und
+rechts von ihm.
+
+Es gibt auch den Befehl »:vnew«, um ein vertikal geteiltes Fenster auf
+einer neuen, leeren Datei zu öffnen.  Ein anderer Weg, dies zu machen: >
+
+	:vertical new
+
+Der Befehl »:vertical« kann vor anderen Befehlen eingefügt werden, die
+ein Fenster teilen.  Dies lässt den Befehl das Fenster vertikal statt
+horizontal teilen.  (Wenn der Befehl kein Fenster teilt, funktioniert er
+unmodifiziert.)
+
+
+ZWISCHEN FENSTERN BEWEGEN
+
+Da Sie Fenster horizontal und vertikal so oft aufteilen können, wie Sie
+wollen, können Sie fast jedes Fensterlayout erzeugen.  Dann können Sie
+diese Befehle benutzen, um sich zwischen ihnen zu bewegen.
+
+	CTRL-W h	gehe in das Fenster links
+	CTRL-W j	gehe in das Fenster unterhalb
+	CTRL-W k	gehe in das Fenster oberhalb
+	CTRL-W l	gehe in das Fenster rechts
+
+	CTRL-W t	gehe in das oberste (top) Fenster
+	CTRL-W b	gehe in das unterste (bottom) Fenster
+
+Sie bemerken dieselben Buchstaben wie für das Bewegen des Cursors.  Und auch
+die Pfeiltasten können benutzt werden, wenn Sie mögen.
+   Mehr Befehle, um in andere Fenster zu gehen: |Q_wi|.
+
+==============================================================================
+*08.5*	Fenster bewegen
+
+Sie haben ein paar Fenster aufgeteilt, aber nun sind Sie an der falschen
+Stelle.  Dann brauchen Sie einen Befehl, um das Fenster irgendwo anders
+hinzubewegen.  Sie haben zum Beispiel drei Fenster wie hier:
+
+	+----------------------------------+
+	|/* Datei zwei.c */		   |
+	|~				   |
+	|~				   |
+	|zwei.c============================|
+	|/* Datei drei.c */		   |
+	|~				   |
+	|~				   |
+	|drei.c============================|
+	|/* Datei eins.c */		   |
+	|~				   |
+	|eins.c============================|
+	|				   |
+	+----------------------------------+
+
+Klar sollte das letzte das oberste sein.  Gehen Sie in das Fenster (indem
+Sie CTRL-W w benutzen) und dann tippen Sie diesen Befehl: >
+
+	CTRL-W K
+
+Dies benutzt den Großbuchstaben »K«.  Was passiert ist dass das Fenster ganz
+nach oben gebracht wird.  Sie bemerken, dass wieder K für nach oben bewegen
+benutzt wird.
+   Wenn Sie eine vertikale Aufteilung haben, bewegt CTRL-W K das aktuelle
+Fenster an den oberen Rand und lässt es die volle Breite des Vim-Fensters
+einnehmen.  Wenn dies Ihr Layout ist:
+
+	+-------------------------------------------+
+	|/* zwei.c */ |/* drei.c */   |/* eins.c */ |
+	|~	      |~	      |~	    |
+	|~	      |~	      |~	    |
+	|~	      |~	      |~	    |
+	|~	      |~	      |~	    |
+	|~	      |~	      |~	    |
+	|zwei.c========drei.c==========eins.c=======|
+	|					    |
+	+-------------------------------------------+
+
+Dann resultiert das Benutzen von CTRL-W K im mittleren Fenster (drei.c) in:
+
+	+-------------------------------------------+
+	|/* drei.c */				    |
+	|~					    |
+	|~					    |
+	|drei.c=====================================|
+	|/* zwei.c */	       |/* eins.c */	    |
+	|~		       |~		    |
+	|zwei.c=================eins.c==============|
+	|					    |
+	+-------------------------------------------+
+
+Die anderen drei ähnlichen Befehle (Sie können sie nun sicher raten):
+
+	CTRL-W H	bewege Fenster an den linken Bildschirmrand
+	CTRL-W J	bewege Fenster an den unteren Rand
+	CTRL-W L	bewege Fenster an den linken Rand
+
+==============================================================================
+*08.6*	Befehle für alle Fenster
+
+Wenn Sie mehrere Fenster offen haben und Vim beenden wollen, können Sie
+jedes Fenster getrennt schließen.  Ein schnellerer Weg ist es diesen Befehl
+zu benutzen: >
+
+	:qall
+
+Dies steht für »quit all« (beende alle).  Falls eines der Fenster
+Änderungen enthält, beendet sich Vim nicht.  Der Cursor wird automatisch
+in einem Fenster mit Änderungen positioniert.  Dann können Sie entweder
+»:write« benutzen, um die Änderungen zu sichern, oder »quit!«, um sie
+wegzuwerfen.
+
+Falls Sie wissen, dass es Fenster mit Änderungen gibt, und Sie wollen alle
+diese Änderungen sichern, benutzen Sie diesen Befehl: >
+
+	:wall
+
+Dies steht für »write all« (schreibe alle).  Aber tatsächlich schreibt er nur
+Dateien mit Änderungen.  Vim weiß, dass es keinen Sinn ergibt, Dateien zu
+schreiben, die nicht geändert wurden.
+   Und dann ist da die Kombination aus »:qall« und »:wall«: der Befehl »write
+and quit all« (schreibe und beende alle): >
+
+	:wqall
+
+Dies schreibt alle modifizierten Dateien und beendet Vim.
+   Schließlich gibt es einen Befehl, der Vim beendet und alle Änderungen
+wegwirft: >
+
+	:qall!
+
+Seien Sie vorsichtig, es gibt keine Möglichkeit, diesen Befehl
+zurückzunehmen!
+
+
+EIN FENSTER FÜR ALLE ARGUMENTE ÖFFNEN
+
+Um Vim ein Fenster für jede Datei öffnen zu lassen, starten Sie ihn mit
+dem Argument »-o«: >
+
+	vim -o eins.txt zwei.txt drei.txt
+
+Dies ergibt:
+
+	+-------------------------------+
+	|Datei eins.txt			|
+	|~				|
+	|eins.txt=======================|
+	|Datei zwei.txt			|
+	|~				|
+	|zwei.txt=======================|
+	|Datei drei.txt			|
+	|~				|
+	|drei.txt=======================|
+	|				|
+	+-------------------------------+
+
+Das Argument »-O« wird benutzt, um vertikal geteilte Fenster zu erhalten.
+   Wenn Vim bereits läuft, öffnet der Befehl »:all« ein Fenster für jede Datei
+in der Argumentenliste.  »:vertical all« ergibt eine vertikal Teilung.
+
+==============================================================================
+*08.7*	Unterschiede mit »vimdiff« betrachten
+
+Es gibt eine besondere Art, Vim zu starten, die die Unterschiede zwischen zwei
+Dateien zeigt.  Lassen Sie uns eine Datei »main.c« nehmen und ein Paar Zeichen
+in einer Zeile einfügen.  Schreiben Sie diese Datei mit gesetzter 'backup'-
+Option, so dass die Sicherheitskopie »main.c~« die vorige Version der Datei
+enthält.
+   Tippen Sie diesen Befehl in einer Shell (nicht in Vim): >
+
+	vimdiff main.c~ main.c
+
+Vim startet mit zwei Fenstern Seite an Seite.  Sie sehen nur die Zeile, in
+der Sie Zeichen hinzugefügt haben, und ein Paar Zeilen unter- und oberhalb.
+
+	 VV		      VV
+	+-----------------------------------------+
+	|+ +--123 lines: /* a|+ +--123 lines: /* a|  <- fold
+	|  text		     |	text		  |
+	|  text		     |	text		  |
+	|  text		     |	text		  |
+	|  text		     |	changed text	  |  <- geänderte Zeile
+	|  text		     |	text		  |
+	|  text		     |	------------------|  <- gelöschte Zeile
+	|  text		     |	text		  |
+	|  text		     |	text		  |
+	|  text		     |	text		  |
+	|+ +--432 lines: text|+ +--432 lines: text|  <- Faltung
+	|  ~		     |	~		  |
+	|  ~		     |	~		  |
+	|main.c~==============main.c==============|
+	|					  |
+	+-----------------------------------------+
+
+(Dieses Bild zeigt nicht die Hervorhebung, benutzen Sie den Befehl vimdiff
+für eine bessere Ansicht.)
+
+Die Zeilen, die nicht modifiziert wurden, werden zu einer Zeile
+zusammengefasst.  Dies nennt sich geschlossene Faltung.  Sie werden in dem
+Bild durch »<- Faltung« angezeigt.  Also steht die einzelne Faltungszeile am
+Anfang für 123 Textzeilen.  Diese Zeilen sind in beiden Dateien gleich.
+   Die mit »<- geänderte Zeile« markierte Zeile wird hervorgehoben, und der
+eingefügte Text wird in einer anderen Farbe angezeigt.  Dies zeigt deutlich,
+was der Unterschied zwischen den beiden Dateien ist.
+   Die gelöschte Zeile wird mit »---« in dem Fenster von main.c angezeigt.
+Siehe die Markierung »<- gelöschte Zeile in dem Bild.  Diese Zeichen sind
+nicht wirklich da.  Sie füllen nur main.c, so dass sie dieselbe Anzahl Zeilen
+wie das andere Fenster anzeigt.
+
+
+DIE FALTUNGSSPALTE
+
+Jedes Fenster hat links eine Spalte mit einem etwas anderen Hintergrund.  In
+dem obigen Bild werden diese durch »VV« angezeigt.  Sie bemerken, dass da ein
+Plus vor jeder geschlossenen Faltung ist.  Bewegen Sie den Mauszeiger auf
+dieses Plus und klicken Sie den linken Knopf.  Die Faltung öffnet sich, und
+Sie können den Text sehen, den sie enthält.
+   Die Faltungsspalte enthält ein Minus-Zeichen für eine offene Faltung.  Wenn
+Sie auf dieses Minus klicken, schließt sich die Faltung.
+   Offensichtlich funktioniert dies nur, wenn Sie eine arbeitende Maus haben. 
+Sie können auch »zo« benutzen, um eine Faltung zu öffnen, und »zc«, um sie zu
+schließen.
+
+
+DIFFEN IN VIM
+
+Eine andere Art, den Diff-Modus zu starten, kann aus Vim gemacht werden.
+Editieren Sie die Datei »main.c«, dann machen Sie eine Aufteilung und
+zeigen die Unterschiede: >
+
+	:edit main.c
+	:vertical diffsplit main.c~ 
+
+Der Befehl »:vertical« wird benutzt, um das Fenster vertikal aufzuteilen.
+Falls Sie dies auslassen, bekommen Sie eine horizontale Aufteilung.
+
+Falls Sie eine Patch- oder Diff-Datei haben, können Sie die dritte Art
+benutzen, den Diff-Modus zu starten.  Zuerst editieren Sie die Datei, auf
+die der Patch angewendet wird.  Dann geben Sie Vim den Namen der
+Patch-Datei: >
+
+	:edit main.c
+	:vertical diffpatch main.c.diff
+
+WARNUNG: Die Patch-Datei darf nur einen Patch enthalten, für die Datei, die
+Sie editieren.  Ansonsten bekommen Sie viele Fehlermeldungen, und einige
+Dateien könnten unerwarteterweise gepatcht werden.
+   Das Patchen wird nur auf die Kopie der Datei in Vim angewendet.  Die Datei
+auf Ihrem Speichermedium bleibt unmodifiziert (bis Sie sich entscheiden, die
+Datei zu schreiben).
+
+
+ROLLBINDUNG
+
+Wenn die Dateien mehr Änderungen haben, können Sie wie üblich rollen.  Vim
+versucht, beide Fenster an derselben Position starten zu lassen, so dass Sie
+einfach die Unterschiede Seite an Seite sehen können.
+   Wenn Sie dies für einen Moment nicht wollen, benutzen Sie diesen Befehl: >
+
+	:set noscrollbind
+
+
+ZU ÄNDERUNGEN SPRINGEN
+
+Wenn Sie irgendwie das Falten deaktiviert haben, mag es schwer sein, die
+Änderungen zu finden.  Benutzen Sie diesen Befehl, um vorwärts zur
+nächsten Änderung zu springen: >
+
+	]c
+
+Für die andere Richtung benutzen Sie: >
+
+	[c
+
+Stellen Sie eine Anzahl voran, um weiter weg zu springen.
+
+
+ÄNDERUNGEN ENTFERNEN
+
+Sie können Text von einem Fenster zum anderen bewegen.  Dies entfernt
+entweder Unterschiede oder fügt neue hinzu.  Vim hält nicht in allen
+Situationen die Hervorhebung aktuell.  Um sie zu aktualisieren, benutzen Sie
+diesen Befehl: >
+
+	:diffupdate
+
+Um einen Unterschied zu entfernen, können Sie den Text in einem
+hervorgehobenen Block von einem Fenster zu einem anderen bewegen.  Nehmen
+Sie das Beispiel »main.c« und »main.c~« oben.  Bewegen Sie den Cursor in
+das linke Fenster, auf die Zeile, die im anderen Fenster gelöscht wurde.
+Nun tippen Sie diesen Befehl: >
+
+	dp
+
+Die Änderung wird entfernt, indem der Text des aktuellen Fensters in dem
+anderen Fenster eingefügt wird.  »dp« steht für »diff put«.
+   Sie können es auch anders herum machen.  Bewegen Sie den Cursor in das
+rechte Fenster, zu der Zeile wo »changed« eingefügt wurde.  Nun tippen Sie
+diesen Befehl: >
+
+	do
+
+Die Änderung wird nun entfernt, indem der Text aus dem anderen Fenster
+geholt wird.  Weil nun keine Änderungen mehr übrig sind, stellt Vim allen
+Text in eine geschlossene Faltung.  »do« steht für »diff obtain«
+(beziehen).  »dg« wäre besser gewesen, aber das hat schon eine andere
+Bedeutung (»dgg« löscht vom Cursor bis zur ersten Zeile).
+
+Zu den Detail zum Diff-Modus siehe |vimdiff|.
+
+==============================================================================
+*08.8*	Verschiedenes
+
+Die Option 'laststatus' kann benutzt werden, um anzugeben, wann das letzte
+Fenster eine Statuszeile hat:
+
+	0	nie
+	1	nur bei mehreren Fenstern (Voreinstellung)
+	2	immer
+
+Viele Befehle, die eine andere Datei editieren, haben eine Variante, die das
+Fenster aufteilt.  Bei Befehlen auf der Befehlszeile wird ein »s«  voran
+gestellt.  Zum Beispiel springt »:tag« auf ein Tag.  »:stag« teilt das Fenster
+und springt auf ein Tag.
+   Befehlen im Normalmodus wird ein CTRL-W vorangestellt.  CTRL-^ springt zu
+der alternativen Datei, CTRL-W CTRL-^ teilt das Fenster und editiert die
+alternative Datei.
+
+Die Option 'splitbelow' kann gesetzt werden, um ein neues Fenster unter dem
+aktuellen Fenster erscheinen zu lassen.  Die Option 'splitrigt' kann gesetzt
+werden, um beim vertikalen Aufteilen das neue Fenster rechts vom aktuellen
+erscheinen zu lassen.
+
+Beim Fensteraufteilen können Sie einen Modifizierungsbefehl voranstellen,
+der sagt, wo das Fenster erscheinen soll:
+
+	:leftabove {bef}	links oder über dem aktuellen Fenster
+	:aboveleft {bef}	ebenso
+	:rightbelow {bef}	rechts oder unterhalb des aktuellen Fensters
+	:belowright {bef}	ebenso
+	:topleft {bef}		am oberen oder linken Rand des Vim-Fensters
+	:botright {bef}		am unteren oder rechten Rand des Vim-Fensters
+
+
+==============================================================================
+*08.9*	Reiterseiten
+
+Sie werden bemerkt haben, dass sich Fenster nie überlappen.  Dass bedeutet,
+dass der Platz schnell knapp werden kann.  Die Lösung hierfür nennt sich
+Reiterseiten (tab pages).
+
+Nehmen Sie an, Sie editieren »diesedatei«.  Um eine neue Reiterseite zu
+erzeugen, benutzen Sie diesen Befehl: >
+
+	:tabedit jenedatei
+
+Dies editiert die Datei »jenedatei« in einem neuen Fenster, das das ganze
+Vim-Fenster einnimmt.  Und Sie bemerken am oberen Bildschirmrand eine Leiste
+mit den beiden Dateinamen:
+
+	+----------------------------------+
+	| diesedatei | /jenedatei/ _______X|    (jenedatei ist fett)
+	|/* jenedatei */		   |
+	|jenes				   |
+	|jenes				   |
+	|~				   |
+	|~				   |
+	|~				   |
+	|				   |
+	+----------------------------------+
+
+Sie haben nun zwei Reiterseiten.  Die erste hat ein Fenster für
+»diesedatei« und die zweite ein Fenster für »jenedatei«.  Es verhält
+sich wie zwei Seiten übereinander, mit einem herausschauenden Reiter, der
+den Dateinamen anzeigt.
+
+Nun klicken Sie mit der Maus auf »diesedatei« in der obersten Zeile.  Das
+Ergebnis ist:
+
+	+----------------------------------+
+	| /diesedatei/ | jenedatei _______X|    (diesedatei ist fett)
+	|/* diesedatei */		   |
+	|dieses				   |
+	|dieses				   |
+	|~				   |
+	|~				   |
+	|~				   |
+	|				   |
+	+----------------------------------+
+
+Also können Sie, indem Sie auf das Label in der obersten Zeile klicken,
+zwischen Reiterseiten wechseln.  Falls Sie keine Maus haben oder sie nicht
+nutzen wollen, können Sie den Befehl »gt« verwenden.  Merkhilfe: Goto Tab
+(gehe zu Reiter).
+
+Lassen Sie uns nun mit folgendem Befehl eine weitere Reiterseite erzeugen: >
+
+	:tab split
+
+Dies erzeugt eine neue Reiterseite mit einem Fenster, das denselben Puffer
+editiert wie das Fenster wo wir waren:
+
+	+----------------------------------------+
+	| diesedatei | /diesedatei/ | jenedatei X|   (diesedatei ist fett)
+	|/* diesedatei */		         |
+	|dieses				         |
+	|dieses				         |
+	|~				         |
+	|~				         |
+	|~				         |
+	|				         |
+	+----------------------------------------+
+
+Sie können »:tab« vor jeden Ex-Befehl setzen, der ein Fenster öffnet.
+Das Fenster wird in einer neuen Reiterseite geöffnet.  Noch ein Beispiel: >
+
+	:tab help gt
+
+... zeigt den Hilfetext für »gt« in einer neuen Reiterseite.
+
+Ein paar mehr Dinge, die Sie mit Reiterseiten tun können:
+
+- klicken Sie mit der Maus in den Bereich nach dem letzten Label
+	Die nächste Reiterseite wird ausgewählt, wie mit »gt«.
+
+- klicken Sie mit der Maus auf das »X« in der oberen rechten Ecke
+	Die aktuelle Reiterseite wird geschlossen.  Außer es gibt ungesicherte
+	Änderungen in der aktuellen Reiterseite.
+
+- doppelklicken Sie mit der Maus in die oberste Zeile
+	Eine neue Reiterseite wird erzeugt.
+
+- der Befehl »:tabonly«
+	Schließt alle Reiterseiten außer der aktuellen.  Außer es gibt
+	ungesicherte Änderungen in anderen Reiterseiten.
+
+Für weitere Informationen zu Reiterseiten siehe |tab-page|.
+
+==============================================================================
+
+Nächstes Kapitel: |usr_09.txt| Die GUI benutzen
+
+Copyright: siehe |manual-copyright| vim:tw=78:ts=8:ft=help:norl:

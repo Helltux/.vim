@@ -1,0 +1,715 @@
+*usr_40.txt*	Für Vim version 7.4.  Letzte Änderung: 2013-Aug-05
+
+		     VIM-BENUTZERHANDBUCH - von Bram Moolenaar
+
+			      Neue Befehle machen
+
+
+Vim ist ein erweiterbarer Editor.  Sie können eine Folge von Befehlen
+nehmen, die Sie oft benutzen, und aus ihnen einen neuen Befehl machen.  Oder
+einen bestehenden Befehl neu definieren.  Automatische Befehle machen es
+möglich, Befehle automatisch auszuführen.
+
+|40.1|	Tasten belegen
+|40.2|	Befehlszeilen-Befehle definieren
+|40.3|	Automatische Befehle
+
+Nächstes Kapitel: |usr_41.txt|  Ein Vim-Skript schreiben
+ Voriges Kapitel: |usr_32.txt|  Der Undo-Baum
+Inhaltsübersicht: |usr_toc.txt|
+
+==============================================================================
+*40.1*	Tasten belegen
+
+Eine einfache Belegung wurde in Abschnitt |05.3| erklärt.  Das Prinzip ist,
+dass eine Folge von Tastendrücken in eine andere Folge von Tastendrücken
+übersetzt wird.  Dies ist ein einfacher, jedoch mächtiger Mechanismus.
+   Die einfachste Form ist, dass eine Taste mit einer Folge von Tasten belegt
+wird.  Weil die Funktionstasten, außer <F1>, keine vordefinierte Bedeutung in
+Vim haben, sind diese eine gute Wahl zur Belegung.  Beispiel: >
+
+	:map <F2> GoDate: <Esc>:read !date<CR>kJ
+
+Dies zeigt, wie drei Modi benutzt werden.  Nachdem mit »G« in die letzte Zeile
+gegangen wird, öffnet der Befehl »o« eine neue Zeile und geht in den
+Einfügemodus.  Der Text »Date: « wird eingefügt und <Esc> bringt uns aus dem
+Einfügemodus.
+   Beachten Sie den Gebrauch von Sondertasten in <>.  Dies nennt sich Notation
+mit spitzen Klammern.  Sie tippen diese als getrennte Zeichen, nicht, indem
+Sie die Taste selbst drücken.  Dadurch wird die Belegung besser lesbar, und
+Sie können den Text ohne Probleme kopieren und einfügen.
+   Das Zeichen »:« bringt Vim in die Befehlszeile.  Der Befehl »:read !date«
+liest die Ausgabe des Befehls »date« und hängt sie unter der aktuellen Zeile
+an.  Das <CR> wird benötigt, um den Befehl »:read« auszuführen.
+   An dieser Stelle der Ausführung sieht der Text so aus:
+
+	Date:  ~
+	Fri Jun 15 12:54:34 CEST 2001 ~
+
+Jetzt bewegt »kJ« den Cursor nach oben und fügt die Zeilen zusammen.
+   Um zu entscheiden, welche Taste oder Tasten Sie zum Belegen verwenden,
+siehe |map-which-keys|.
+
+
+BELEGUNGEN UND MODI
+
+Der Befehl »:map« definiert Neubelegungen für Tasten im normalen Modus.
+Sie können auch Belegungen für andere Modi definieren.  »:imap« zum
+Beispiel ist für den Einfügemodus zuständig.  Sie können ihn benutzen,
+um ein Datum unter dem Cursor einzufügen: >
+
+	:imap <F2> <CR>Date: <Esc>:read !date<CR>kJ
+
+Sie sieht sehr wie die Belegung für <F2> im normalen Modus aus, nur der Beginn
+ist verschieden.  Die Belegung von <F2> im normalen Modus ist noch da.  Also
+können Sie dieselbe Taste für jeden Modus unterschiedlich belegen.
+   Beachten Sie, dass, obwohl diese Belegung im Einfügemodus beginnt, sie im
+normalen Modus endet.  Falls Sie im Einfügemodus fortfahren wollen, hängen Sie
+der Belegung ein »a« an.
+
+Hier ist eine Übersicht der Belegungsbefehle und in welchem Modus sie
+arbeiten:
+
+	:map		normal, visuell und Operator-hängend
+	:vmap		visuell
+	:nmap		normal
+	:omap		Operator-hängend
+	:map!		Einfügen und Befehlszeile
+	:imap		Einfügen
+	:cmap		Befehlszeile
+
+Der Operator-hängende Modus ist, wenn Sie ein Operator-Zeichen, so wie
+»d« oder »y«, getippt haben, und Vim auf einen Bewegungsbefehl oder ein
+Textobjekt wartet.  Wenn Sie also »dw« tippen, wird das »w« im
+Operator-hängenden Modus eingegeben.
+
+Angenommen, Sie wollen <F7> so definieren, dass der Befehl »d<F7>« einen
+C-Programm-Block löscht (in geschwungene Klammern, {}, eingeschlossener
+Text).  Analog würde »y<F7>« den Programm-Block in das unbenannte
+Register kopieren.  Was Sie demnach tun müssen, ist es, <F7> so zu
+definieren, dass sie den aktuellen Programm-Block auswählt.  Sie können
+dies mit dem folgenden Befehl tun: >
+
+	:omap <F7> a{
+
+Dies lässt <F7> eine Blockauswahl »a{« im Operator-hängenden Modus
+ausführen, genau als hätten Sie es getippt.  Diese Belegung ist nützlich,
+falls das Tippen von { auf Ihrer Tastatur schwierig ist.
+
+
+BELEGUNGEN AUFLISTEN
+
+Um die aktuell definierten Belegungen zu sehen, benutzen Sie »:map« ohne
+Argumente.  Oder eine der Varianten, die den Modus beinhalten, in dem sie
+arbeiten.  Die Ausgabe könnte so aussehen:
+
+	   _g		 :call MyGrep(1)<CR> ~
+	v  <F2>		 :s/^/> /<CR>:noh<CR>`` ~
+	n  <F2>		 :.,$s/^/> /<CR>:noh<CR>`` ~
+	   <xHome>	 <Home>
+	   <xEnd>	 <End>
+
+
+Die erste Spalte der Liste gibt an, in welchem Modus die Belegung
+funktioniert.  Dies ist »n« für den normalen Modus, »i« für den Einfügemodus
+usw.  Ein Leerzeichen wird für eine mit »:map« definierte Belegung verwandt,
+also effektiv im normalen und visuellen Modus.
+   Ein nützlicher Aspekt, die Belegungen zu listen, ist zu prüfen, ob
+Sondertasten in <>-Form erkannt wurden (dies funktioniert nur, wenn Farbe
+unterstützt wird).  Wenn zum Beispiel <Esc> farbig dargestellt wird, steht es
+für die Escape-Taste.  Wenn es dieselbe Farbe wie der andere Text hat, sind es
+nur fünf Zeichen.
+
+
+NEUBELEGEN
+
+Das Ergebnis einer Belegung wird nach anderen Belegungen in ihr inspiziert.
+Zum Beispiel könnten die Belegungen für <F2> oben folgendermaßen
+abgekürzt werden: >
+
+	:map <F2> G<F3>
+	:imap <F2> <Esc><F3>
+	:map <F3>  oDate: <Esc>:read !date<CR>kJ
+
+Für den normalen Modus wird <F2> so belegt, dass in die letzte Zeile
+gegangen wird, und dann so getan wird, als ob <F3> gedrückt wurde.  Im
+Einfügemodus beendet <F2> den Einfügemodus mit <Esc> und benutzt dann
+ebenfalls <F3>.  Dann wird <F3> so belegt, dass sie die tatsächliche Arbeit
+macht.
+
+Angenommen, Sie benutzen kaum den Ex-Modus, und wollen den Befehl »Q« dazu
+verwenden, Text zu formatieren (so war es in alten Vim-Versionen).  Die
+folgende Belegung macht es: >
+
+	:map Q gq
+
+Aber in seltenen Fällen brauchen Sie dennoch den Ex-Modus.  Lassen Sie uns
+»gQ« mit Q belegen, so dass Sie immer noch in den Ex-Modus gehen können:
+>
+
+	:map gQ Q
+
+Was nun geschieht: Sie tippen »gQ« und es ist mit »Q« belegt.  So weit, so
+gut.  Aber dann ist »Q« mit »gq« belegt, also resultiert das Tippen von »gQ«
+in »gq«, und Sie kommen gar nicht in den Ex-Modus.
+   Um zu vermeiden, dass Tasten wieder belegt werden, benutzen Sie den Befehl
+»:noremap«: >
+
+	:noremap gQ Q
+
+Nun weiß Vim, dass »Q« nicht nach weiteren Belegungen, die für es
+gelten, inspiziert werden soll.  Analoge Befehle gibt es für jeden Modus:
+
+	:noremap	normal, visuell und Operator-hängend
+	:vnoremap	visuell
+	:nnoremap	normal
+	:onoremap	Operator-hängend
+	:noremap!	Einfügen und Befehlszeile
+	:inoremap	Einfügen
+	:cnoremap	Befehlszeile
+
+
+DIE REKURSIVE BELEGUNG
+
+Wenn eine Belegung sich selbst auslöst, läuft sie für immer.  Dies kann
+benutzt werden, um eine Aktion eine unbegrenzte Anzahl von Malen zu
+wiederholen.
+   Sie haben zum Beispiel eine Liste von Dateien, die eine Versionsnummer in
+der ersten Zeile enthalten.  Sie editieren diese mit »vim *.txt«.  Sie
+editieren nun die erste Datei.  Definieren Sie diese Belegung: >
+
+	:map ,, :s/5.1/5.2/<CR>:wnext<CR>,,
+
+Nun tippen Sie »,,«.  Dies löst die Belegung aus.  Sie ersetzt in der ersten
+Zeile »5.1« durch »5.2«.  Dann macht sie »:wnext« um die Datei zu sichern und
+die nächste zu editieren.  Die Belegung endet mit »,,«.  Die löst dieselbe
+Belegung wieder aus, also die Ersetzung machen usw.
+   Dies geht so weiter bis es einen Fehler gibt.  In diesem Falle könnte es
+eine Datei sein, wo der Befehl »:substitute« keine Übereinstimmung für »5.1«
+findet.  Sie können dann »5.1« einfügen und fortfahren, indem Sie »,,« erneut
+tippen.  Oder »:wnext« scheitert, weil Sie in der letzten Datei der Liste
+sind.
+   Wenn eine Belegung auf halben Wege in einen Fehler läuft, wird der Rest der
+Belegung nicht mehr beachtet.  CTRL-C unterbricht die Belegung (unter
+MS-Windows CTRL-Untbr).
+
+
+EINE BELEGUNG LÖSCHEN
+
+Um eine Belegung zu entfernen, benutzen Sie den Befehl »:unmap«.  Und
+wieder entspricht der Modus, für den die Belegung entfernt wird, dem
+benutzten Befehl:
+
+	:unmap		normal, visuell und Operator-hängend
+	:vunmap		visuell
+	:nunmap		normal
+	:ounmap		Operator-hängend
+	:unmap!		Einfügen und Befehlszeile
+	:iunmap		Einfügen
+	:cunmap		Befehlszeile
+
+Es gibt einen Trick, eine Belegung zu definieren, die im normalen und
+Operator-hängenden Modus funktioniert, aber nicht im visuellen.  Zuerst
+definiere man sie für alle drei Modi, dann lösche man sie im visuellen
+Modus: >
+
+	:map <C-A> /---><CR>
+	:vunmap <C-A>
+
+Beachten Sie, dass die fünf Zeichen »<C-A>« für die Tastenkombination
+CTRL-A stehen.
+
+Um alle Belegungen zu entfernen, benutzen Sie den Befehl |:mapclear|.  Sie
+können die Variationen für verschiedene Modi nun raten.  Seien Sie
+vorsichtig mit diesem Befehl, er kann nicht rückgängig gemacht werden.
+
+
+SONDERZEICHEN
+
+Dem Befehl »:map« kann ein weiterer Befehl folgen.  Das Zeichen »|« trennt die
+beiden Befehle.  Dies bedeutet auch, dass das Zeichen »|« nicht in einem
+Belegungsbefehl verwandt werden kann.  Um eins einzubeziehen, benutzen Sie
+<Bar> (fünf Zeichen).  Beispiel:
+>
+	:map <F8> :write <Bar> !checkin %<CR>
+
+Dasselbe Problem trifft auf den Befehl »:unmap« zu, und zusätzlich müssen Sie
+auf nachfolgende Leerzeichen achten.  Diese zwei Befehle sind verschieden:
+>
+	:unmap a | unmap b
+	:unmap a| unmap b
+
+Der erste Befehl versucht »a « freizugeben, mit einem nachfolgen
+Leerzeichen.
+
+Wenn Sie ein Leerzeichen in einer Belegung verwenden, benutzen Sie <Space>
+(sieben Zeichen): >
+
+	:map <Space> W
+
+Dies lässt die Leertaste ein Leerzeichen-getrenntes Wort vorwärts bewegen.
+
+Es ist nicht möglich, einen Kommentar direkt nach eine Belegung zu setzen,
+weil das Zeichen »"« als Teil der Belegung angenommen wird.  Sie können
+»|"« verwenden, dies beginnt einen neuen, leeren Befehl mit einem
+Kommentar.  Beispiel: >
+
+	:map <Space> W|     " Benutze Leertaste, um ein Wort vorwärts zu gehen
+
+
+BELEGUNGEN UND ABKÜRZUNGEN
+
+Abkürzungen verhalten sich sehr wie Belegungen für den Einfügemodus.  Die
+Argumente werden auf dieselbe Art behandelt.  Der Hauptunterschied ist die
+Art, wie sie ausgelöst werden.  Eine Abkürzung wird ausgelöst, indem man ein
+nicht-Wort-Zeichen nach dem Wort tippt.  Eine Belegung wird ausgelöst, wenn
+das letzte Zeichen getippt wird.
+   Ein weiterer Unterschied ist, dass die Zeichen, die Sie für eine Abkürzung
+tippen, in den Text eingefügt werden, während Sie sie tippen.  Wenn die
+Abkürzung ausgelöst wird, werden diese Zeichen gelöscht und durch das ersetzt,
+was die Abkürzung produziert.  Beim Tippen der Zeichen für eine Belegung
+wird nichts eingefügt, bis Sie das letzte Zeichen tippen, das sie auslöst.
+Falls die Option 'showcmd' gesetzt ist, werden die getippten Zeichen in der
+letzten Zeile des Vim-Fensters angezeigt.
+   Eine Ausnahme ist, wenn eine Belegung mehrdeutig ist.  Angenommen, Sie
+haben zwei Belegungen gemacht: >
+
+	:imap aa foo
+	:imap aaa bar
+
+Wenn Sie nun »aa« tippen, weiß Vim nicht, ob er die erste oder das zweite
+Belegung anwenden soll.  Er wartet, ob ein weiteres Zeichen getippt wird.
+Falls es ein »a« ist, wird die zwete Belegung angewandt und resultiert in
+»bar«.  Falls es zum Beispiel ein Leerzeichen ist, wird die erste Belegung
+angewandt, resultierend in »foo«, und dann wird das Leerzeichen einfügt.
+
+
+DARÜBERHINAUS...
+
+Das Schlüsselwort <script> kann benutzt werden, um ein Belegung lokal zu
+einem Skript zu machen.  Siehe |:map-<script>|.
+
+Das Schlüsselwort <buffer> kann verwandt werden, um eine Belegung lokal zu
+einem bestimmten Puffer zu machen.  Siehe |:map-<buffer>|.
+
+Das Schlüsselwort <unique> kann benutzt werden, um das Definieren einer
+Belegung scheitern zu lassen, wenn sie bereits existiert.  Ansonsten
+überschreibt eine neue Belegung einfach die alte.  Siehe |:map-<unique>|.
+
+Um eine Taste nichts machen zu lassen, belegen Sie sie mit <Nop> (fünf
+Zeichen).  Dies lässt die Taste <F7> überhaupt nichts machen: >
+
+	:map <F7> <Nop>| map! <F7> <Nop>
+
+Es darf kein Zeichen nach <Nop> sein.
+
+==============================================================================
+*40.2*	Befehlszeilen-Befehle definieren
+
+Der Editor Vim ermöglicht Ihnen, Ihre eigenen Befehle zu definieren.  Sie
+führen diese ganz wie jeden anderen Befehl im Befehlszeilen-Modus aus.
+   Um einen Befehl zu definieren, benutzen Sie den Befehl »:command«, wie
+folgt: >
+
+	:command DeleteFirst 1delete
+
+Wenn Sie nun den Befehl »:DeleteFirst« ausführen, führt Vim »:1delete«
+aus, was die erste Zeile löscht.
+
+	Anmerkung:
+	Benutzer-definierte Befehle müssen mit einem Großbuchstaben beginnen.
+	Sie können nicht »:X«, »:Next« und »:Print« verwenden.  Der
+	Unterstrich kann nicht benutzt werden! Sie können Ziffern verwenden,
+	aber davon wird abgeraten.
+
+Um die benutzer-definierten Befehle aufzulisten, führen Sie den folgenden
+Befehl aus: >
+
+	:command
+
+Ganz wie mit den eingebauten Befehlen, können die benutzer-definierten
+Befehle abgekürzt werden.  Sie brauchen nur soviel zu tippen, um den Befehl
+von einem anderen zu unterscheiden.  Befehlszeilen-Vervollständigung kann
+benutzt werden, um den vollen Namen zu erhalten.
+
+
+ANZAHL VON ARGUMENTEN
+
+Benutzer-definierte Befehle können eine Folge von Argumenten nehmen.  Die
+Zahl von Argumenten muss mit der Option -nargs angegeben werden.  Das
+Beispiel :DeleteFirst etwa nimmt keine Argumente, so dass Sie es wie folgt
+definieren können: >
+
+	:command -nargs=0 DeleteFirst 1delete
+
+Da jedoch null Argumente der Standardfall sind, brauchen Sie nicht
+»-nargs=0« hinzufügen.  Die anderen Werte von -nargs sind wie folgt:
+
+	-nargs=0	Keine Argumente
+	-nargs=1	Ein Argument
+	-nargs=*	Jede Anzahl von Argumenten
+	-nargs=?	Null oder ein Argument
+	-nargs=+	Ein oder mehr Argumente
+
+
+DIE ARGUMENTE BENUTZEN
+
+Innerhalb der Befehls-Definition werden die Argumente durch das
+Schlüsselwort <args> repräsentiert.  Zum Beispiel: >
+
+	:command -nargs=+ Say :echo "<args>"
+
+Wenn Sie nun tippen >
+
+	:Say Hello World
+
+gibt Vim »Hello World« aus.  Falls Sie jedoch ein doppeltes Zitatzeichen
+hinzufügen, funktioniert es nicht.  Zum Beispiel: >
+
+	:Say he said "hello"
+
+Um Sonderzeichen in eine Zeichenkette verwandelt zu bekommen, richtig
+geschützt als ein Ausdruck, benutzen Sie »<q-args>«: >
+
+	:command -nargs=+ Say :echo <q-args>
+
+Nun resultiert der obige Befehl »:Say« in diesem zur Ausführung: >
+
+	:echo "he said \"hello\""
+
+Das Schlüsselwort <f-args> enthält dieselben Informationen wie das
+Schlüsselwort <args>, außer dass sie in einem Format sind, das sich für
+einen Funktionsaufruf eignet.  Zum Beispiel:
+>
+	:command -nargs=* DoIt :call AFunction(<f-args>)
+	:DoIt a b c
+
+führt den folgenden Befehl aus: >
+
+	:call AFunction("a", "b", "c")
+
+
+ZEILENBEREICH
+
+Einige Befehlen nehmen einen Bereich als ihr Argument.  Um Vim zu sagen,
+dass Sie solch einen Befehl definieren, müssen Sie die Option -range
+angeben.  Die Werte für diese Option sind wie folgt:
+
+	-range		Bereich ist erlaubt; Standard ist die aktuelle Zeile.
+	-range=%	Bereich ist erlaubt; Standard ist die ganze Datei.
+	-range={count}	Bereich ist erlaubt; die letzte Zeilenzahl in ihm wird
+			als eine einzelne Nummer genommen, deren Standard
+			{count} ist.
+
+Wenn ein Bereich angegeben wird, erhalten die Schlüsselwörter <line1> und
+<line2> die Werte der ersten und letzten Zeile im Bereich.  Der folgende
+Befehl definiert zum Beispiel den Befehl SaveIt, der den angegeben Bereich
+in die Datei »save_file« schreibt: >
+
+	:command -range=% SaveIt :<line1>,<line2>write! save_file
+
+
+ANDERE OPTIONEN
+
+Einige der anderen Optionen und Schlüsselwörter sind wie folgt:
+
+	-count={number}		Der Befehl kann eine Anzahl nehmen, deren
+				Standard {number} ist.  Die resultierende
+				Anzahl kann über das Schlüsselwort <count>
+				verwandt werden.
+	-bang			Sie können ein ! benutzen.  Falls vorhanden,
+				ergibt das Benutzen von <bang> ein !.
+	-register		Sie können ein Register angeben.  (Standard
+				ist das unbenannte Register.)
+				Die Registerangabe ist verfügbar als <reg>
+				(aka. <register>).
+	-complete={type}	Typ der zu verwendenden Befehlszeilen-
+				Vervollständigung. Siehe |:command-completion|
+				für die Liste möglicher Werte.
+	-bar			Dem Befehl kann | und ein anderer Befehl
+				folgen, oder " und ein Kommentar
+	-buffer			Der Befehl ist nur für den aktuellen Puffer
+				verfügbar.
+
+Schließlich haben Sie das Schlüsselwort <lt>.  Es steht für das Zeichen
+<.  Benutzen Sie dies, um die besondere Bedeutung der erwähnten <>-Elemente
+aufzuheben.
+
+
+NEUDEFINIEREN UND LÖSCHEN
+
+Um denselben Befehl neu zu definieren, benutzen Sie das Argument »!«: >
+
+	:command -nargs=+ Say :echo "<args>"
+	:command! -nargs=+ Say :echo <q-args>
+
+Um einen Benutzer-Befehl zu löschen, benutzen Sie »:delcommand«.  Er
+nimmt ein einzelnes Argument, das der Name des Befehls ist.  Beispiel: >
+
+	:delcommand SaveIt
+
+Um alle Benutzer-Befehle zu löschen: >
+
+	:comclear
+
+Vorsicht, dies kann nicht zurück genommen werden!
+
+Mehr Details über all dies im Referenz-Handbuch: |user-commands|.
+
+==============================================================================
+*40.3*	Automatische Befehle
+
+Ein automatischer Befehl wird automatisch als Antwort auf irgendein Ereignis
+ausgeführt, sei es, dass eine Datei gelesen wird, oder ein Puffer-Wechsel.
+Durch die Benutzung von automatischen Befehlen können Sie Vim zum Beispiel
+beibringen, komprimierte Dateien zu editieren.  Dies wird in dem |gzip|-Plugin
+benutzt.
+   Automatische Befehle sind sehr mächtig.  Nutzen Sie sie sorgsam, und sie
+werden Ihnen sehr helfen.  Nutzen Sie sie sorglos, werden Sie Ihnen viel Ärger
+bereiten.
+
+Angenommen, Sie haben einen Zeitstempel am Ende einer Datei, und wollen ihn
+jedesmal, wenn die Datei geschrieben wird, ersetzen.  Zuerst definieren Sie
+eine Funktion: >
+
+	:function DateInsert()
+	:  $delete
+	:  read !date
+	:endfunction
+
+Sie wollen dass diese Funktion jedesmal aufrufen wird, genau dann bevor eine
+Datei geschrieben wird.  So geht es: >
+
+	:autocmd BufWritePre *  call DateInsert()
+
+»BufWritePre« ist das Ereignis, für das dieser automatische Befehl ausgelöst
+wird: Genau vor (prä) dem Sichern einer Datei.  Der »*« ist ein Muster zur
+Übereinstimmung mit dem Dateinamen.  In diesem Falle greift es bei allen
+Dateien.
+   Wenn dieser Befehl aktiv ist, und Sie »:write« geben, prüft Vim nach
+jedweden automatischen Befehlen für BufWritePre und führt sie aus, und führt
+dann das »:write« aus.
+   Die generelle Form des Befehls :autocmd ist wie folgt: >
+
+	:autocmd [group] {events} {file_pattern} [nested] {command}
+
+Der Gruppenname ist optional.  Er wird zum Verwalten und Aufrufen der Befehle
+verwandt (mehr dazu später).  Der Parameter {events} ist eine (komma-
+getrennte) Liste von Ereignissen, die den Befehl auslösen.
+   {file_pattern} ist ein Dateiname, für gewöhnlich mit Wildcards.  Das
+Benutzen von »*.txt« lässt den automatischen Befehl für alle Dateien, deren
+Name in ».txt« endet, wirken.  Das optionale Flag [nested] erlaubt die
+Verschachtelung von automatischen Befehlen, und schließlich ist {command} der
+auszuführende Befehl.
+
+
+EREIGNISSE
+
+Eines der nützlichsten Ereignisse ist BufReadPost.  Es wird ausgelöst,
+nachdem eine neue Datei editiert wird.  Es wird für gewöhnlich zum Setzen
+von Optionen verwandt.  Sie wissen zum Beispiel, dass »*.gsm«-Dateien
+GNU-Assembler-Sprache sind.  Um die Syntax richtig zu bekommen, definieren
+Sie diesen automatischen Befehl: >
+
+	:autocmd BufReadPost *.gsm  set filetype=asm
+
+Falls Vim den Typ der Datei erkennen kann, setzt er die Option 'filetype'
+für Sie.  Dies löst das Ereignis Filetype aus.  Benutzen Sie dies, um
+etwas zu tun, wenn ein bestimmter Typ Dateien editiert wird.  Zum Beispiel
+das Laden einer List von Abkürzungen für Text-Dateien: >
+
+	:autocmd Filetype text  source ~/.vim/abbrevs.vim
+
+Beim Beginnen, eine neue Datei zu editieren, könnten Sie Vim ein Skelett
+einfügen lassen: >
+
+	:autocmd BufNewFile *.[ch]  0read ~/skeletons/skel.c
+
+Siehe |autocmd-events| für eine komplette Liste von Ereignissen.
+
+
+MUSTER
+
+Das Argument {file_pattern} kann tatsächlich eine komma-getrennte Liste von
+Datei-Mustern sein.  »*.c,*.h« zum Beispiel trifft Dateien, die auf ».c« oder
+».h« enden.
+   Die gewöhnlichen Datei-Wildcards können benutzt werden.  Hier ist eine
+Zusammenfassung der am häufigsten benutzten:
+
+	*		Trifft jedes Zeichen jede Anzahl von Malen
+	?		Trifft jegliches Zeichen einmal
+	[abc]		Trifft die Zeichen a, b oder c
+	.		Trifft einen Punkt
+	a{b,c}		Triff »ab« und »ac«
+
+Wenn das Muster einen Schrägstrich (/) beinhalten, vergleicht Vim
+Verzeichnisnamen.  Ohne Schrägstrich wird nur der letzte Teil eines
+Dateinamens benutzt.  Zum Beispiel trifft »*.txt« »/home/biep/readme.txt«.
+Das Muster »/home/biep/*« würde es auch treffen.  Aber nicht »/home/foo/*.txt«
+   Wenn ein Schrägstrich einbezogen wird, vergleicht Vim das Muster sowohl
+gegen den vollen Datei-Pfad (»/home/biep/readme.txt« als auch den relativen
+(z.B. »biep/readme.txt«).
+
+	Anmerkung:
+	Wenn Sie mit einem System arbeiten, das einen Rückwärtsschrägstrich
+	als Verzeichnistrenner benutzt, so wie MS-Windows, benutzen Sie immer
+	noch Vorwärtsschrägstriche.  Dies macht es einfacher, das Muster zu
+	schreiben, weil ein Rückwärtsschrägstrich eine besondere Bedeutung
+	hat.  Es macht den automatischen Befehl außerdem portabel.
+
+
+LÖSCHEN
+
+Um einen automatischen Befehl zu löschen, benutzen Sie denselben Befehl,
+mit dem es definiert wurde, aber lassen {command} am Ende aus und benutzen
+ein »!«.  Beispiel: >
+
+	:autocmd! FileWritePre *
+
+Dies löscht alle automatischen Befehle für das Ereignis »FileWritePre«,
+die das Muster »*« benutzen.
+
+
+AUFLISTEN
+
+Um alle aktuell definierten automatischen Befehle aufzulisten, benutzen Sie
+dies: >
+
+	:autocmd
+
+Die Liste kann sehr lang sein, besonders wenn Dateityp-Erkennung benutzt
+wird.  Um nur einen Teil der Befehle aufzulisten, geben Sie die Gruppe, das
+Ereignis und/oder das Muster an.  Um zum Beispiel alle automatischen Befehle
+für BufNewFile aufzulisten: >
+
+	:autocmd BufNewFile
+
+Um alle automatischen Befehle für das Muster »*.c« aufzulisten: >
+
+	:autocmd * *.c
+
+Das verwenden von »*« für das Ereignis listet alle Ereignisse auf.  Um
+alle automatischen Befehle für die Gruppe cprograms aufzulisten: >
+
+	:autocmd cprograms
+
+
+GRUPPEN
+
+Das Element {group}, benutzt beim Definieren eines automatischen Befehls,
+gruppiert verwandte automatische Befehle zusammen.  Dies kann zum Beispiel
+benutzt werden, um alle automatischen Befehle in einer gewissen Gruppe zu
+löschen.
+   Wenn Sie mehrere automatische Befehle für eine gewisse Gruppe definieren,
+benutzen Sie den Befehl »:augroup«.  Lassen Sie uns zum Beispiel automatische
+Befehle für C-Programme definieren: >
+
+	:augroup cprograms
+	:  autocmd BufReadPost *.c,*.h :set sw=4 sts=4
+	:  autocmd BufReadPost *.cpp   :set sw=3 sts=3
+	:augroup END
+
+Dies tut dasselbe wie: >
+
+	:autocmd cprograms BufReadPost *.c,*.h :set sw=4 sts=4
+	:autocmd cprograms BufReadPost *.cpp   :set sw=3 sts=3
+
+Um alle automatischen Befehle der Gruppe »cprograms« zu löschen: >
+
+	:autocmd! cprograms
+
+
+VERSCHACHTELUNG
+
+Generell lösen Befehle, die als das Ergebnis eines automatischen Befehls
+ausgeführt werden, keine neuen Ereignisse aus.  Falls Sie zum Beispiel eine
+Datei als Antwort auf ein Ereignis FileChangedShell lesen, werden die
+automatischen Befehle, die die Syntax setzen, nicht ausgelöst.  Um zu
+erreichen, dass die Ereignisse ausgelöst werden, fügen Sie das Argument
+»nested« hinzu: >
+
+	:autocmd FileChangedShell * nested  edit
+
+
+AUTOMATISCHE BEFEHLE AUSFÜHREN
+
+Es ist möglich, einen automatischen Befehl auszulösen, indem man vorgibt,
+dass sich ein Ereignis ereignet hat.  Dies ist nützlich, um einen
+automatischen Befehl einen anderen auslösen zu lassen.  Beispiel: >
+
+	:autocmd BufReadPost *.new  execute "doautocmd BufReadPost " . expand("<afile>:r")
+
+Dies definiert einen automatischen Befehl, der ausgelöst wird, wenn eine
+neue Datei editiert wird.  Der Dateiname muss auf ».new« enden.  Der
+Befehl »:execute« benutzt Ausdrucks-Auswertung, um einen neuen Befehl zu
+formen und auszuführen.  Wenn die Datei »tryout.c.new« editiert wird, ist
+der ausgeführte Befehl: >
+
+	:doautocmd BufReadPost tryout.c
+
+Die Funktion expand() nimmt das Argument »<afile>«, was für den
+Dateinamen steht, für den der automatische Befehl ausgeführt wurde, und
+nimmt die Wurzel des Dateinamens mit »:r«.
+
+»:doautocmd« führt auf dem aktuellen Puffer aus.  Der Befehl
+»:doautoall« funktioniert wie »doautocmd«, außer dass er auf allen
+Puffern ausführt.
+
+
+BEFEHLE DES NORMALEN MODUS BENUTZEN
+
+Die Befehle, die von einem automatischen Befehl ausgeführt werden, sind
+Befehlszeilen-Befehle.  Falls Sie einen Befehl des normalen Modus verwenden
+wollen, kann der Befehl »:normal« benutzt werden.  Beispiel: >
+
+	:autocmd BufReadPost *.log normal G
+
+Dies lässt den Cursor in die letzte Zeile von *.log-Dateien springen, wenn Sie
+beginnen, eine zu editieren.
+   Den Befehl »:normal« zu verwenden ist ein wenig verzwickt.  Zuerst stellen
+Sie sicher, dass sein Argument ein vollständiger Befehl ist, eingeschlossen
+aller Argumente.  Wenn Sie »i« benutzen, um in den Einfüge-Modus zu gehen,
+muss es auch auch ein <Esc> geben, um den Einfüge-Modus zu verlassen.  Falls
+Sie »/« verwenden, um ein Suchmuster zu beginnen, muss es ein <CR> geben, um
+es auszuführen.
+   Der Befehl »:normal« benutzt allen Text nach ihm als Befehle.  Also kann es
+kein | geben, dem ein weiterer Befehl folgt.  Um dies zu umgehen, packen Sie
+den Befehl »:normal« in einen »:execute«-Befehl.  Dies macht es auch möglich,
+undruckbare Zeichen auf eine angenehme Weise zu übergeben.  Beispiel: >
+
+	:autocmd BufReadPost *.chg execute "normal ONew entry:\<Esc>" |
+		\ 1read !date
+
+Dies zeigt auch den Gebrauch des Rückwärtsschrägstrichs, um einen langen
+Befehl auf mehrere Zeilen zu verteilen.  Dies kann in Vim-Skripten verwandt
+werden (nicht auf der Befehlszeile).
+
+Wenn Sie wollen, dass der automatische Befehl etwas Kompliziertes macht, was
+es beinhaltet, in der Datei herumzuspringen und dann an die ursprüngliche
+Position zurückzukehren, mögen Sie die Ansicht der Datei wiederherstellen
+wollen.  Siehe |restore-position| für ein Beispiel.
+
+
+EREIGNISSE IGNORIEREN
+
+Bisweilen wollen Sie nicht, dass ein automatischer Befehl ausgelöst wird.
+Die Option 'eventignore' enthält eine List von Ereignissen, die komplett
+ignoriert werden.  Das folgende zum Beispiel lässt Ereignisse für das
+Betreten und Verlassen eines Fensters ignorieren: >
+
+	:set eventignore=WinEnter,WinLeave
+
+Um alle Ereignisse zu ignorieren, benutzen Sie den folgenden Befehl: >
+
+	:set eventignore=all
+
+Um es zum normalen Verhalten zurück zu setzen, machen Sie 'eventignore'
+leer: >
+
+	:set eventignore=
+
+==============================================================================
+
+Nächstes Kapitel: |usr_41.txt| Ein Vim-Skript schreiben
+
+Copyright: siehe |manual-copyright| vim:tw=78:ts=8:ft=help:norl:

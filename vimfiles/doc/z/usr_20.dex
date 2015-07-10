@@ -1,0 +1,410 @@
+*usr_20.txt*	Für Vim version 7.4.  Letzte Änderung: 2006-Apr-24
+
+		     VIM BENUTZERHANDBUCH - von Bram Moolenaar
+
+		     Befehle auf der Befehlszeile schnell tippen
+
+
+Vim hat ein Paar generische Features, die es einfacher machen, Befehle
+einzugeben.  Doppelpunkt-Befehle können abgekürzt, editiert und wiederholt
+werden.  Vervollständigung ist für fast alles verfügbar.
+
+|20.1|	Editieren der Befehlszeile
+|20.2|	Abkürzungen auf der Befehlszeile
+|20.3|	Vervollständigung auf der Befehlszeile
+|20.4|	Geschichte der Befehlszeile
+|20.5|	Befehlszeilen-Fenster
+
+Nächstes Kapitel: |usr_21.txt|  Weggehen und wiederkommen
+ Voriges Kapitel: |usr_12.txt|  Klevere Tricks
+Inhaltsübersicht: |usr_toc.txt|
+
+==============================================================================
+*20.1*	Editieren der Befehlszeile
+
+Wenn Sie einen Doppelpunkt-Befehl (mit :), oder eine Zeichenkette mit / oder
+? suchen, bringt Vim den Cursor ans Ende des Bildschirms.  Dort tippen Sie
+den Befehl oder das Suchmuster.  Diese Zeile heißt die Befehlszeile.  Auch
+wenn sie zum Eingeben eines Suchbefehls benutzt wird.
+
+Die offensichtlichste Art, den getippten Befehl zu editieren, ist das Drücken
+der Rückschritt-Taste.  Dies löscht das Zeichen vor dem Cursor.  Um ein
+anderes, früher getipptes Zeichen zu löschen, bewegen Sie zunächst den Cursor
+mit den Pfeiltasten.
+  Sie haben zum Beispiel dies getippt: >
+
+	:s/col/pig/
+
+Bevor Sie <Eingabe> drücken, bemerken Sie, dass »col« »cow« sein
+sollte.  Um dies zu korrigieren, tippen Sie fünfmal <Links>.  Der Cursor
+ist nun genau nach »col«.  Tippen Sie <Rückschritt> und »w« um zu
+korrigieren: >
+
+	:s/cow/pig/
+
+Nun können Sie direkt <Eingabe> drücken.  Sie brauchen den Cursor nicht an
+das Zeilenende zu bewegen, bevor Sie den Befehl ausführen.
+
+Die am häufigsten benutzten Tasten, um in der Befehlszeile zu bewegen:
+
+	<Links>			Ein Zeichen links
+	<Rechts>			Ein Zeichen rechts
+	<S-Links> oder <C-Links>	Ein Wort links
+	<S-Rechts> oder <C-Rechts>	Ein Wort rechts
+	CTRL-B oder <Pos1>	zum Beginn der Befehlszeile
+	CTRL-E oder <Ende>	zum Ende der Befehlszeile
+
+	Anmerkung:
+	<S-Links> (Cursor links mit Umschalttaste) und <C-Links> (Cursor links
+	mit Steuerungstaste) funktionieren nicht auf allen Tastaturen.
+	Dasselbe für die anderen Kombinationen mit Umschalt- und Steuerungs-
+	Taste.
+
+Sie können auch die Maus benutzen, um den Cursor zu bewegen.
+
+
+LÖSCHEN
+
+Wie erwähnt, löscht <Rückschritt> das Zeichen vor dem Cursor. Um ein
+ganzes Wort zu löschen, benutzen Sie CTRL-W.
+
+	/the fine pig ~
+
+		     CTRL-W
+
+	/the fine ~
+
+CTRL-U entfernt allen Text, erlaubt Ihnen also, von Neuem zu beginnen.
+
+
+ÜBERSCHREIBEN
+
+Die Taste <Einfg> schaltet zwischen dem Einfügen von Zeichen und dem
+Ersetzen der bestehenden um.  Beginnen Sie mit diesem Text:
+
+	/the fine pig ~
+
+Bewegen Sie den Cursor zum Beginn von »fine« mit zweimal <S-Links> (oder
+acht Mal <Links>, falls <S-Links> nicht funktioniert.  Nun drücken Sie
+<Einfg>, um zu Überschreiben umzuschalten, und tippen Sie »great«:
+
+	/the greatpig ~
+
+Hoppla, wir haben das Leerzeichen verloren.  Jetzt benutzen Sie nicht
+<Rückschritt>, weil das das »t« löschen würde (dies unterscheidet sich
+vom Ersetzungs-Modus).  Drücken Sie stattdessen <Einfg>, um von
+Überschreiben zu Einfügen zu schalten, und tippen Sie das Leerzeichen:
+
+	/the great pig ~
+
+
+ABBRECHEN
+
+Sie dachten daran, einen Befehl mit : oder / auszuführen, haben sich aber
+anders entschlossen.  Um loszuwerden, was Sie bereits getippt haben, ohne es
+auszuführen, drücken Sie CTRL-C oder <Esc>.
+
+	Anmerkung:
+	<Esc> ist die universelle Taste um »herauszukommen«.
+	Unglücklicherweise führt im guten alten Vi das Drücken von <Esc> in
+	einer Befehlszeile den Befehl aus! Weil das als Fehler betrachtet
+	werden könnte, benutzt Vim <Esc>, um den Befehl zurückzunehmen.  Aber
+	mit der Option 'cpoptions' kann es Vi-kompatibel gemacht werden.  Und
+	wenn eine Belegung benutzt wird (die möglicherweise für Vi geschrieben
+	wurde), funktioniert <Esc> ebenfalls Vi-kompatibel.  Daher ist das
+	Benutzen von CTRL-C eine Methode, die immer funktioniert.
+
+Falls Sie am Anfang der Befehlszeile sind, bricht das Drücken von
+<Rückschritt> den Befehl ab.  Es ist gleich dem Löschen des »:« oder
+»/«, mit dem die Zeile beginnt.
+
+==============================================================================
+*20.2*	Abkürzungen auf der Befehlszeile
+
+Einige der »:«-Befehle sind wirklich lang.  Wir haben bereits erwähnt,
+dass »:substitute« als »:s« abgekürzt werden kann.  Dies ist ein
+generischer Mechanismus, alle »:«-Befehle können abgekürzt werden.
+
+Wie kurz kann ein Befehl werden? Es gibt 26 Buchstaben, und viel mehr Befehle.
+»:set« zum Beispiel beginnt auch mit »:s«, aber »:s« löst keinen »:set«-Befehl
+aus.  Stattdessen kann »:set« als »:se« abgekürzt werden.
+   Wenn die kürzere Form eines Befehls für zwei Befehle verwandt werden
+könnte, steht sie nur für einen von ihnen.  Es gibt keine Logik dahinter,
+welche, Sie müssen sie lernen.  In den Hilfe-Dateien wird die kürzeste Form,
+die funktioniert, erwähnt.  Zum Beispiel: >
+
+	:s[ubstitute]
+
+Dies bedeutet, dass die kürzeste Form von »:substitute« »:s« ist.  Die
+folgenden Zeichen sind optional.  Also funktionieren »:su« und »:sub«
+auch.
+
+In dem Benutzerhandbuch benutzen wir entweder den vollen Namen eines
+Befehls, oder eine Kurzform, die noch lesbar ist.  »:function« kann zum
+Beispiel als »:fu« abgekürzt werden.  Aber weil die meisten Leute nicht
+verstehen, für was das steht, verwenden wir »:fun«.  (Vim hat keinen
+Befehl »:funny«, ansonsten wäre auch »:fun« verwirrend.)
+
+Es empfiehlt sich, dass sie in Vim-Skripten den vollen Befehlsnamen schreiben.
+Das macht es leichter lesbar, wenn Sie später Änderungen machen.  Außer für
+einige häufig benutzte Befehle wie »:w« (»:write«) und »:r« (»:read«).
+   Ein besonders verwirrendes Exemplar ist »:end«, was für »:endif«,
+»:endwhile« oder »:endfunction« stehen könnte.  Benutzen Sie deshalb immer
+den vollen Namen.
+
+
+KURZNAMEN FÜR OPTIONEN
+
+Im Benutzerhandbuch wird die lange Version von Optionsnamen benutzt.  Viele
+Optionen haben auch einen Kurznamen.  Anders als bei »:«-Befehlen gibt es
+nur einen Kurznamen, der funktioniert.  Der Kurzname von 'autoindent' ist
+zum Beispiel 'ai'.  Also machen diese beiden Befehle dasselbe: >
+
+	:set autoindent
+	:set ai
+
+Sie können die vollständige Liste von Lang- und Kurznamen hier
+|option-list| finden.
+
+==============================================================================
+*20.3*	Vervollständigung auf der Befehlszeile
+
+Dies ist eines von Vims Features, das durch sich selbst ein Grund ist, von
+Vi zu Vim zu wechseln.  Einmal, dass Sie dies benutzt haben, können Sie
+nicht mehr ohne.
+
+Angenommen, Sie haben ein Verzeichnis, das diese Dateien enthält:
+
+	info.txt
+	intro.txt
+	bodyofthepaper.txt
+
+Um die letzte zu editieren, benutzen Sie den Befehl: >
+
+	:edit bodyofthepaper.txt
+
+Leicht tippt sich dies falsch.  Eine viel schnellere Weise ist: >
+
+	:edit b<Tab>
+
+Was denselben Befehl ergibt.  Was passiert? Die Taste <Tab> vervollständigt
+das Wort vor dem Cursor.  In diesem Falle »b«.  Vim schaut in das
+Verzeichnis und findet nur eine Datei, die mit »b« beginnt.  Das muss die
+Datei sein, nach der Sie suchen, also vervollständigt Vim den Dateinamen
+für Sie.
+
+Tippen Sie nun: >
+
+	:edit i<Tab>
+
+Vim macht einen Piepton und gibt Ihnen: >
+
+	:edit info.txt
+
+Der Piepton bedeutet, dass Vim mehr als eine Übereinstimmung gefunden hat.
+Er benutzt dann die (alphabetisch) erste Übereinstimmung.  Falls Sie
+nochmals <Tab> drücken, erhalten Sie: >
+
+	:edit intro.txt
+
+Falls Ihnen also das erste <Tab> nicht die Datei gibt, nach der Sie suchen,
+drücken Sie sie nochmals.  Falls es mehrere Übereinstimmungen gibt, sehen Sie
+sie alle, eine nach der anderen.
+   Falls Sie <Tab> auf dem letzten übereinstimmenden Eintrag drücken, kommen
+Sie zu dem zurück, was Sie als erstes getippt haben: >
+
+	:edit i
+
+Dann beginnt es von neuem.  Vim kreist also durch die Liste von
+Übereinstimmungen.  Benutzen Sie CTRL-P, um in anderer Richtung durch die
+Liste zu gehen:
+
+	      <------------------- <Tab> -------------------------+
+								  |
+		  <Tab> -->		       <Tab> -->
+	:edit i		      :edit info.txt		   :edit intro.txt
+		  <-- CTRL-P		       <-- CTRL-P
+	   |
+	   +---------------------- CTRL-P ------------------------>
+
+
+KONTEXT
+
+Wenn Sie »:set i« statt »:edit i« tippen und <Tab> drücken, erhalten
+Sie: >
+
+	:set icon
+
+Hey, warum haben Sie nicht »:set info.txt« bekommen? Das ist so, weil Vim
+kontext-bezogene Vervollständigung hat.  Die Art der Wörter, nach denen Vim
+sucht, hängt von dem Befehl vor ihm ab.  Vim weiß, dass man nach dem Befehl
+»:set« keinen Dateinamen, aber einen Optionsnamen benutzen kann.
+   Und wieder, falls Sie weiter <Tab> tippen, kreist Vim durch alle
+Übereinstimmungen.  Es gibt schon ein Paar, besser man tippt zuerst weitere
+Zeichen: >
+
+	:set isk<Tab>
+
+Gibt: >
+
+	:set iskeyword
+
+Tippen Sie nun »=« und drücken Sie <Tab>: >
+
+	:set iskeyword=@,48-57,_,192-255
+
+Was hier geschieht, ist, dass Vim den alten Wert der Option einfügt.  Nun
+können Sie ihn editieren.
+   Was mit <Tab> vervollständigt wird, ist, was Vim an der Stelle erwartet.
+Probieren Sie es einfach aus, um zu sehen, wie es funktioniert.  In manchen
+Situationen werden Sie nicht bekommen, was Sie wollen.  Das ist entweder so,
+weil Vim nicht weiß, was Sie wollen, oder weil Vervollständigung für diese
+Situation nicht implementiert wurde.  In dem Fall bekommen Sie ein <Tab>
+eingefügt (angezeigt als ^I)
+
+
+ÜBEREINSTIMMUNGEN AUFLISTEN
+
+Wenn es viele Übereinstimmungen gibt, würden Sie gerne einen Überblick
+sehen.  Machen Sie dies, indem Sie CTRL-D drücken.  Zum Beispiel ergibt das
+Drücken von CTRL-D nach: >
+
+	:set is
+
+dies: >
+
+	:set is
+	incsearch  isfname    isident    iskeyword  isprint
+	:set is
+
+Vim listet die Übereinstimmungen auf und kommt dann wieder mit dem Text, den
+Sie getippt haben.  Nun können Sie die Liste nach dem Element durchsuchen, das
+Sie wollten.  Falls es nicht da ist, können Sie <Rückschritt> benutzen, um das
+Wort zu korrigieren.  Falls es viele Übereinstimmungen gibt, tippen Sie ein
+Paar Zeichen mehr, bevor Sie <Tab> drücken, um den Rest zu vervollständigen.
+   Falls Sie achtsam geschaut haben, haben Sie bemerkt, das »incsearch« nicht
+mit »is« beginnt.  In diesem Fall steht »is« für den Kurznamen von
+»incsearch«.  (Viele Optionen haben einen kurzen und einen langen Namen.)  Vim
+ist schlau genug zu wissen, dass Sie möglicherweise den Kurznamen der Option
+in den langen Namen erweitern wollten.
+
+
+ES GIBT MEHR
+
+Der Befehl CTRL-L vervollständigt das Wort zu der längsten eindeutigen
+Zeichenkette.  Falls Sie »:edit i« tippen, und es gibt die Dateien
+»info.txt« und »info_backup.txt«, bekommen Sie »:edit info«.
+
+Die Option 'wildmode' kann benutzt werden, um die Weise zu ändern, wie
+Vervollständigung arbeitet.  Die Option 'wildmenu' kann benutzt werden, um
+eine Menü-ähnliche Liste von Übereinstimmungen zu bekommen.  Benutzen Sie
+die Option 'suffixes', um Dateien anzugeben, die weniger wichtig sind und am
+Ende der Dateiliste erscheinen.  Die Option 'wildignore' gibt Dateien an,
+die überhaupt nicht aufgelistet werden.
+
+Mehr über all dies hier: |cmdline-completion|
+
+==============================================================================
+*20.4*	Geschichte der Befehlszeile
+
+In Kapitel 3 haben wir kurz die Geschichte erwähnt.  Grundsätzlich können
+Sie die Taste <hoch> benutzen, um eine ältere Befehlszeile zurückzuholen.
+<runter> bringt Sie dann zu den neueren Befehlen zurück.
+
+Es gibt tatsächlich vier Verläufe.  Die, die wir hier erwähnen, sind für
+»:«-Befehle und für die Suchbefehle »/« und »?«.  Die Befehle »/«
+und »?« teilen eine Geschichte, weil Sie beide Suchbefehle sind.  Die
+beiden anderen Verläufe sind für Ausdrücke und Eingabezeilen für die
+Funktion input().  |cmdline-history|
+
+Angenommen, Sie haben einen Befehl »:set« gegeben, zehn weitere
+Doppelpunkt-Befehle getippt, und wollen nun diesen »:set«-Befehl
+wiederholen.  Sie könnten »:« drücken und dann zehn Mal <hoch>.  Es gibt
+einen schnelleren Weg: >
+
+	:se<hoch>
+
+Vim geht nun zu dem vorigen Befehl zurück, der mit »se« begann.  Sie
+haben eine gute Chance, dass dies der »:set«-Befehl ist, nach dem Sie
+suchen.  Zumindest sollten Sie nicht sehr oft <hoch> drücken müssen
+(solange Sie nicht nur »:set«-Befehle gegeben haben).
+
+Die Taste <hoch> benutzt den bis dahin getippten Text und vergleicht ihn mit
+den Zeilen in der Geschichte.  Nur übereinstimmende Zeilen werden benutzt.
+   Falls Sie die Zeile, nach der Sie suchen, nicht finden, benutzen Sie
+<runter>, um zu dem, was Sie getippt haben, zurückzugehen, und korrigieren Sie
+es.  Oder benutzen Sie CTRL-U, um ganz von Neuem zu beginnen.
+
+Um alle Zeilen in der Geschichte zu sehen: >
+
+	:history
+
+Das ist die Geschichte der »:«-Befehle.  Die Such-Geschichte wird mit
+diesem Befehl angezeigt: >
+
+	:history /
+
+CTRL-P funktioniert wie <hoch>, außer dass es nicht entscheidend ist, was
+Sie bereits getippt haben.  Ähnlich für CTRL-N und <runter>.  CTRL-P steht
+für »previous« (voriges), CTRL-N für »nächstes«.
+
+==============================================================================
+*20.5*	Befehlszeilen-Fenster
+
+Text in der Befehlszeile tippen funktioniert anders als im Einfüge-Modus.
+Es erlaubt nicht viele Befehle, um den Text zu ändern.  Für die meisten
+Befehle ist das in Ordnung, aber manchmal müssen Sie einen komplizierten
+Befehl tippen.  Dann ist das Befehlszeilen-Fenster nützlich.
+
+Öffnen Sie das Befehlszeilen-Fenster mit diesem Befehl: >
+
+	q:
+
+Vim öffnet nun ein (kleines) Fenster am unteren Bildschirmrand.  Es
+enthält die Geschichte der Befehlszeile und am Ende eine leere Zeile:
+
+	+-------------------------------------+
+	|other window			      |
+	|~				      |
+	|file.txt=============================|
+	|:e c				      |
+	|:e config.h.in			      |
+	|:set path=.,/usr/include,,	      |
+	|:set iskeyword=@,48-57,_,192-255     |
+	|:set is			      |
+	|:q				      |
+	|:				      |
+	|command-line=========================|
+	|				      |
+	+-------------------------------------+
+
+Sie sind nun im normalen Modus.  Sie können die Tasten »hjkl« verwenden,
+um umherzubewegen.  Gehen Sie zum Beispiel mit »5k« hoch zu der Zeile »:e
+config.h.in«.  Tippen Sie »$h«, um zu dem »i« von »in« zu gehen, und
+tippen Sie »cwout«.  Nun haben Sie die Zeile zu folgendem verändert:
+
+	:e config.h.out ~
+
+Nun drücken Sie <Eingabe> und dieser Befehl wird ausgeführt.  Das
+Befehlszeilen-Fenster schließt sich.
+   Der Befehl <Eingabe> führt die Zeile unter dem Cursor aus.  Es ist nicht
+entscheidend, ob Vim im Einfüge- oder im normalen Modus ist.
+   Änderungen im Befehlszeilen-Fenster gehen verloren.  Sie ergeben keine
+Änderungen in der Geschichte.  Außer dass die ausgeführten Befehle an das Ende
+der Geschichte angefügt werden, wie mit allen ausgeführten Befehlen.
+
+Das Befehlszeilen-Fenster ist sehr nützlich, wenn Sie Übersicht über die
+Geschichte haben, nach einem ähnlichen Befehl suchen, ihn ein Bisschen
+verändern und ihn ausführen wollen.  Ein Suchbefehl kann benutzt werden, um
+etwas zu finden.
+   Im vorigen Beispiel hätte der Suchbefehl »?config« benutzt werden können,
+um den vorigen Befehl zu finden, der »config« enthält.  Es ist ein Bisschen
+komisch, weil Sie eine Befehlszeile benutzen, um im Befehlszeilen-Fenster zu
+suchen.  Während Sie den Suchbefehl tippen, können Sie kein anderes
+Befehlszeilen-Fenster öffnen, es kann nur eins geben.
+
+==============================================================================
+
+Nächstes Kapitel: |usr_21.txt| Weggehen und wiederkommen
+
+Copyright: siehe |manual-copyright| vim:tw=78:ts=8:ft=help:norl:

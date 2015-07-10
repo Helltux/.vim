@@ -1,0 +1,345 @@
+*usr_11.txt*	Für Vim version 7.4.  Letzte Änderung: 2010-Jul-20
+
+		     VIM-BENUTZERHANDBUCH - von Bram Moolenaar
+
+			   Nach einem Absturz retten
+
+
+Ist Ihr Computer abgestürzt? Und Sie haben haben gerade Stunden mit
+Editieren verbracht? Keine Panik! Vim speichert genug Informationen, um in
+der Lage zu sein, das meiste Ihrer Arbeit wieder herzustellen.  Dieses
+Kapitel zeigt Ihnen, wie Sie Ihre Arbeit wiederholen, und erklärt, wie die
+Auslagerungsdatei benutzt wird.
+
+|11.1|	Grundlegendes Retten
+|11.2|	Wo ist die Auslagerungsdatei?
+|11.3|	Abgestürzt oder nicht?
+|11.4|	Weiterlesen
+
+Nächstes Kapitel: |usr_12.txt|  Klevere Tricks
+ Voriges Kapitel: |usr_10.txt|  Große Änderungen machen
+Inhaltsübersicht: |usr_toc.txt|
+
+==============================================================================
+*11.1*	Grundlegendes Retten
+
+In den meisten Fällen ist das Wiederherstellen einer Datei ziemlich
+einfach, unter Annahme Sie wissen, welche Datei Sie editiert haben (und die
+Festplatte funktioniert noch).  Starten Sie Vim auf der Datei, mit dem
+Argument »-r«: >
+
+	vim -r help.txt
+
+Vim liest die Auslagerungsdatei (benutzt, um Text zu speichern den Sie
+eingegeben haben) und mag Stückchen von der Originaldatei lesen.  Falls Vim
+Ihre Änderungen wiederhergestellt hat, sehen Sie diese Mitteilungen
+(natürlich mit anderen Dateinamen):
+
+	Verwende Auslagerungsdatei ".help.txt.swp" ~
+	Original-Datei "~/vim/runtime/doc/help.txt" ~
+	Wiederherstellung beendet. Prüfen Sie, ob alles alles OK ist. ~
+	(Wollen Sie vielleicht diese Datei unter einem neuen Namen speichern ~
+	und "diff" zur Original-Datei machen, um Änderungen zu prüfen) ~
+	Vielleicht wollen Sie die .swp-Datei jetzt löschen. ~
+
+Um auf der sicheren Seite zu sein, sichern Sie diese Datei unter einem
+anderen Namen: >
+
+	:write help.txt.recovered
+
+Vergleichen Sie die Datei mit der Original-Datei, um zu prüfen, ob Sie das
+bekommen haben, was Sie erwarteten.  Vimdiff ist hierfür sehr nützlich
+|08.7|.  Zum Beispiel: >
+
+	:write help.txt.recovered
+	:edit #
+	:diffsp help.txt
+
+Achten Sie darauf, ob die Original-Datei eine aktuellere Version enthält (Sie
+sicherten die Datei gerade bevor der Computer abstürzte).  Und prüfen Sie,
+dass keine Zeilen fehlen (etwas ging schief, was Vim nicht retten konnte).
+   Falls Vim bei der Wiederherstellung Warn-Nachrichten ausgibt. lesen Sie sie
+sorgfältig.  Dies ist allerdings selten.
+
+Falls die Wiederherstellung Text ergibt, der genau dem Inhalt der Datei
+entspricht, erhalten Sie diese Meldung:
+
+	Verwende Auslagerungsdatei ".help.txt.swp" ~
+	Original-Datei "~/vim/runtime/doc/help.txt" ~
+	Wiederherstellung beendet.  Pufferinhalt stimmt mit Datei-Inhalt~
+	überein.
+	Vielleicht wollen Sie die .swp-Datei löschen. ~
+
+Dies geschieht für gewöhnlich, falls Sie bereits Ihre Änderungen
+wiederhergestellt haben, oder Sie schrieben die Datei nach dem Vornehmen von
+Änderungen.  Es ist ungefährlich, die Auslagerungsdatei nun zu löschen.
+
+Es ist normal, dass die letzten paar Änderungen nicht wiederhergestellt
+werden können.  Vim sichert die Änderungen auf Platte, wenn Sie für etwa
+vier Sekunden nicht tippen, oder nachdem Sie etwa zweihundert Zeichen
+getippt haben.  Dies wird mit den Optionen 'updatetime' und 'updatecount'
+gesetzt.  Wenn also Vim keine Chance hatte, sich selbst zu retten, als das
+System nieder ging, sind die Änderungen nach dem letzten Sichern verloren.
+
+Falls Sie ohne Dateinamen editiert haben, geben Sie eine leere Zeichenkette
+als Argument: >
+
+	vim -r ""
+
+Sie müssen in dem richtigen Verzeichnis sein, andernfalls kann Vim die
+Auslagerungsdatei nicht finden.
+
+==============================================================================
+*11.2*	Wo ist die Auslagerungsdatei?
+
+Vim kann die Auslagerungsdatei an mehreren Orten speichern.  Normalerweise
+ist sie im selben Verzeichnis wie die Original-Datei.  Um sie zu finden,
+wechseln Sie in das Verzeichnis der Datei und benutzen Sie:
+
+	vim -r
+
+Vim listet die Auslagerungsdateien auf, die er finden kann.  Er schaut auch in
+anderen Verzeichnissen, wo die Auslagerungsdatei für Dateien im aktuellen
+Verzeichnis platziert sein können.  Er findet allerdings keine
+Auslagerungsdateien in irgendwelchen anderen Verzeichnissen, er durchsucht
+nicht den Verzeichnisbaum.
+   Die Ausgabe könnte so aussehen:
+
+	Auslagerungsdateien gefunden: ~
+	   Im laufenden Verzeichnis: ~
+	      Eigentum von: mool   vom: Tue May 29 21:00:25 2001 ~
+		 Dateiname: ~mool/vim/vim6/src/main.c ~
+		 verändert: JA ~
+	     Benutzer-Name: mool   Host-Name: masaka.moolenaar.net ~
+		Process-ID: 12525 ~
+	   Im Verzeichnis ~/tmp: ~
+	      -- Nichts -- ~
+	   Im Verzeichnis /var/tmp: ~
+	      -- Nichts -- ~
+	   Im Verzeichnis /tmp: ~
+	      -- Nichts -- ~
+
+Falls es mehrere Auslagerungsdateien gibt, die aussehen, als könnten sie die
+sein, die sie wollen, wird eine Liste dieser Auslagerungsdateien gegeben und
+von Ihnen wird angefordert, die Nummer derjenigen, die Sie benutzen wollen,
+einzugeben.  Schauen Sie sorgfältig auf die Zeiten, um zu entscheiden, welche
+Sie benutzen wollen.
+   In dem Fall, dass Sie nicht wissen, welche Sie benutzen sollen, probieren
+Sie sie einfach der Reihe nach durch und prüfen Sie die sich ergebenden
+Dateien, ob sie das sind, was Sie erwarten.
+
+
+EINE BESTIMMTE AUSLAGERUNGSDATEI BENUTZEN
+
+Falls Sie wissen, welche Auslagerungsdatei benutzt werden muss, können Sie
+wiederherstellen, indem Sie den Namen der Auslagerungsdatei angeben.  Vim
+findet dann den Namen der Original-Datei aus der Auslagerungsdatei heraus.
+
+Beispiel: >
+	vim -r .help.txt.swo
+
+Dies ist auch praktisch, wenn die Auslagerungsdatei in einem anderen
+Verzeichnis als erwartet ist.  Vim erkennt Dateien nach dem Muster
+*.s[uvw][a-z] als Auslagerungsdateien.
+
+Falls das immer noch nicht funktioniert, sehen Sie, welche Dateinamen Vim
+ausgibt, und benennen Sie die Dateien entsprechend um.  Prüfen Sie die
+Option 'directory', um zu sehen, wo Vim die Auslagerungsdatei hingelegt
+haben mag.
+
+	Anmerkung:
+	Vim versucht die Auslagerungsdatei zu finden, indem er die
+	Verzeichnisse in der Option 'dir' absucht, dabei schauend nach
+	Dateien, die »filename.sw?« treffen.  Wenn Wildcard-Erweiterung nicht
+	funktioniert (z.B. wenn die Option 'shell' ungültig ist), unternimmt
+	Vim einen verzweifelten Versuch, die Datei »filename.swp« zu finden.
+	Falls das auch scheitert, müssen Sie den Namen der Auslagerungsdatei
+	selbst angeben, um die Datei wiederherstellen zu können.
+
+==============================================================================
+*11.3*	Abgestürzt oder nicht?				*ATTENTION* *E325*
+
+Vim versucht Sie davor zu schützen, dumme Sachen zu machen.  Angenommen,
+Sie beginnen arglos eine Datei zu editieren, und erwarten, dass sich der
+Inhalt der Datei zeigt.  Stattdessen produziert Vim eine sehr lange
+Nachricht:
+
+		E325: ACHTUNG ~
+	Auslagerungsdatei mit folgendem Namen gefunden: ".main.c.swp" ~
+	      Eigentum von: mool   von: Tue May 29 21:09:28 2001 ~
+		 Dateiname: ~mool/vim/vim6/src/main.c ~
+		 verändert: nein ~
+	     Benutzer-Name: mool   Host-Name: masaka.moolenaar.net ~
+		Prozess-ID: 12559 (läuft noch) ~
+	Beim Öffnen der Datei "main.c" ~
+		       von: Tue May 29 19:46:12 2001 ~
+	 ~
+	(1) Ein anderes Programm editiert möglicherweise diese Datei. ~
+	    Wenn dies der Fall ist, sollten Sie vorsichtig sein, damit ~
+	    es nicht zu Überschneidungen kommt. ~
+	    Ende, oder Fortsetzung mit Vorsicht. ~
+ ~
+	(2) Eine Editiersitzung für diese Datei ist abgestürzt. ~
+	    Wenn dies der Fall ist, so verwenden Sie ":recover" oder "vim -r " ~
+	    um die Änderungen wiederherzustellen (siehe ":help recovery"). ~
+	    Wenn dies bereits geschehen ist, löschen Sie die Auslagerungsdatei ~
+	    ".main.c.swp", um diese Nachricht zu vermeiden. ~
+
+Sie erhalten diese Nachricht, weil Vim prüft, ob bereits eine
+Auslagerungsdatei für diese Datei existiert, wenn das Editieren einer Datei
+begonnen wird. Falls es eine gibt, muss irgendetwas falsch sein.  Es mag
+eine dieser zwei Situationen sein.
+
+1. Eine andere Editier-Sitzung für diese Datei ist aktiv.  Schauen Sie in
+   der Nachricht der Zeile mit »Prozess-ID«.  Sie mag so aussehen:
+
+		Prozess-ID: 12559 (läuft noch) ~
+
+   Der Text »(läuft noch)« zeigt an, dass der Prozess, der diese Datei
+   editiert, auf demselben Computer läuft.  Wenn Sie an einem
+   nicht-Unix-System arbeiten, bekommen Sie nicht diesen Extrahinweis.  Wenn
+   Sie eine Datei über ein Netzwerk editieren, mögen Sie den Hinweis nicht
+   sehen, weil der Prozess auf einem anderen Computer laufen könnte.  In
+   diesen zwei Fällen müssen Sie selbst herausfinden, was die Situation ist.
+      Falls es einen anderen Vim gibt, der dieselbe Datei editiert, resultiert
+   das Fortfahren mit Editieren in zwei Versionen derselben Datei.  Die, die
+   zuletzt gesichert wird, überschreibt die andere, was zum Verlust von
+   Änderungen führt.  Besser, Sie schließen diesen Vim.
+
+2. Die Auslagerungsdatei könnte das Ergebnis eines vorigen Absturzes von
+   Vim oder des Computers sein.  Prüfen Sie die Zeiten, die in der
+   Nachricht erwähnt werden.  Falls das Datum der Auslagerungsdatei neuer
+   ist, als die Datei, die Sie editiert haben, und diese Zeile erscheint:
+
+		verändert: JA ~
+
+   Dann haben Sie sehr wahrscheinlich eine abgestürzte Editier-Sitzung, die
+   eine Wiederherstellung wert ist.
+      Falls das Datum der Datei neuer ist, als das der Auslagerungsdatei, dann
+   wurde sie entweder nach dem Absturz verändert (vielleicht haben Sie vorher
+   wiederhergestellt, aber die Auslagerungsdatei nicht gelöscht?), oder die
+   Datei wurde vor dem Absturz, aber nach dem letzten Schreiben der
+   Auslagerungsdatei, gesichert (dann haben Sie Glück: Sie brauchen diese alte
+   Auslagerungsdatei nicht einmal).  Vim warnt Sie hierüber mit einer Extra-
+   Zeile:
+
+      neuer als Auslagerungsdatei! ~
+
+
+UNLESBARE AUSLAGERUNGSDATEI
+
+Manchmal erscheint die Zeile
+
+	[kann nicht gelesen werden] ~
+
+unter dem Namen der Auslagerungsdatei.  Die kann gut oder schlecht sein,
+abhängig von den Umständen.
+
+Es ist gut, falls eine vorige Editier-Sitzung abstürzte, ohne dass Sie
+Änderungen an der Datei gemacht haben.  Dann zeigt eine
+Verzeichnis-Auflistung der Auslagerungsdatei, dass sie null Bytes hat.  Sie
+können sie löschen und fortfahren.
+
+Es ist ein wenig schlecht. wenn Sie keine Leseberechtigung für die
+Auslagerungsdatei haben.  Sie mögen die Datei nur-lesend betrachten wollen,
+oder beenden.  Falls Sie selbst auf einem Mehr-Benutzer-System die
+Änderungen unter einem anderen Login-Namen gemacht haben, mag ein
+Ausloggen, gefolgt von einem Einloggen unter dem anderen Login-Namen den
+»Lesefehler« beheben.  Oder Sie mögen herausfinden wollen, wer zuletzt
+die Datei editierte (oder immer noch editiert), und mit derjenigen Person
+reden.
+
+Es ist sehr schlecht, falls es bedeutet, dass es einen physischen Lesefehler
+auf der Platte gibt, die die Auslagerungsdatei enthält.  Glücklicherweise
+passiert dies so gut wie nie.  Sie mögen die Datei zunächst nur-lesend
+betrachten wollen (falls Sie können), um das Ausmaß der Änderungen, die
+»vergessen« wurden, zu sehen.  Falls Sie für die Datei verantwortlich
+sind, bereiten Sie sich darauf vor, Ihre letzten Änderungen nochmals zu
+machen.
+
+
+WAS TUN?					*swap-exists-choices*
+
+Falls Dialoge unterstützt werden, werden Sie gebeten, eine von fünf
+Optionen zu wählen:
+
+  Auslagerungsdatei ".main.c.swp" ist bereits vorhanden! ~
+  Nur zum [L]esen öffnen, Trotzdem (e)ditieren, (W)iederherstellen, ~
+  (D)atei Löschen, (B)eenden, (A)bbrechen ~
+
+L  Nur zum Lesen öffnen.  Benutzen Sie dies wenn Sie die Datei nur betrachten
+   wollen, und sie nicht wiederherstellen brauchen.  Sie mögen dies nutzen
+   wollen, wenn Sie wissen, dass jemand anderes die Datei editiert, aber Sie
+   wollen nur hineinschauen und keine Änderungen machen.
+
+E  Trotzdem editieren.  Benutzen Sie dies mit Vorsicht! Falls die Datei in
+   einem anderen Vim editiert wird, könnten Sie mit zwei Versionen der Datei
+   enden.  Vim versucht Sie zu warnen, wenn dies passiert, aber besser
+   Vorsicht als Nachsicht.
+
+W  Wiederherstellen der Datei aus der Auslagerungsdatei.  Benutzen Sie dies,
+   wenn Sie wissen, dass die Auslagerungsdatei Änderungen enthält, die Sie
+   wiederherstellen wollen.
+
+B  Beenden.  Dies vermeidet es, zu beginnen, die Datei zu editieren. Benutzen
+   Sie dies, falls es einen anderen Vim gibt, der dieselbe Datei editiert.
+      Wenn Sie Vim gerade gestartet haben, beendet dies Vim.  Beim Starten von
+   Vim mit Dateien in mehreren Fenstern beendet sich Vim nur, falls es eine
+   Auslagerungsdatei für die erste gibt.  Beim Benutzen des Befehls edit wird
+   die Datei nicht geladen, und Sie gelangen zurück zur vorher editierten
+   Datei.
+
+A  Abbrechen.  Wie Beenden, bricht aber auch weitere Befehle ab.  Dies ist
+   nützlich beim Laden eines Skripts, das viele Dateien editiert, zum Beispiel
+   eine Sitzung mit mehreren Fenstern.
+
+D  Lösche die Auslagerungsdatei.  Benutzen Sie dies, wenn Sie sicher sind,
+   dass Sie sie nicht mehr brauchen.  Wenn Sie zum Beispiel keine Änderungen
+   enthält, oder wenn die Datei selbst neuer ist als die Auslagerungsdatei.
+      Unter Unix wird diese Option nur angeboten, wenn der Prozess, der die
+   Auslagerungsdatei erzeugt hat, nicht mehr zu laufen scheint.
+
+Falls Sie den Dialog nicht erhalten (Sie benutzen eine Vim-Version, die ihn
+nicht unterstützt), müssen Sie es von Hand machen.  Um die Datei
+wiederherzustellen, benutzen Sie diesen Befehl: >
+
+	:recover
+
+
+Vim kann nicht immer erkennen, das bereits eine Auslagerungsdatei für eine
+Datei besteht.  Dies ist der Fall, wenn die andere Editier-Sitzung die
+Auslagerungsdateien in ein anderes Verzeichnis legt, oder wenn der Dateiname
+für die Datei verschieden ist beim Editieren auf verschiedenen Maschinen.
+Verlassen Sie sich daher nicht darauf, dass Vim Sie immer warnt.
+
+Falls Sie diese Nachricht wirklich nicht sehen wollen, können Sie das Flag
+'A' der Option 'shortmess' hinzufügen.  Aber es ist sehr ungewöhnlich,
+dass Sie dies brauchen.
+
+Für Anmerkungen über Verschlüsselung und die Auslagerungsdatei siehe
+|:recover-crypt|.
+
+==============================================================================
+*11.4*	Weiterlesen
+
+|swap-file|	Eine Erklärung darüber, wo die Auslagerungsdatei erzeugt wird
+		und was ihr Name ist.
+|:preserve|	Die Auslagerungsdatei von Hand auf Platte schreiben.
+|:swapname|	Namen der Auslagerungsdatei für die aktuelle Datei anzeigen.
+'updatecount'	Zahl von Anschlägen, nach denen die Auslagerungsdatei auf
+		Platte geschrieben wird.
+'updatetime'	Timeout, nach dem die Auslagerungsdatei auf Platte geschrieben
+		wird.
+'swapsync'	Ob die Platte gesynct wird, wenn die Auslagerungsdatei
+		geschrieben wird.
+'directory'	Liste von Verzeichnisnamen, wo die Auslagerungsdatei zu
+		speichern ist.
+'maxmem'	Grenze für Speicherverbrauch, bevor Text in die
+		Auslagerungsdatei geschrieben wird.
+'maxmemtot'	Dasselbe, aber insgesamt für alle Dateien.
+
+==============================================================================
+
+Nächstes Kapitel: |usr_12.txt| Klevere Tricks
+
+Copyright: siehe |manual-copyright| vim:tw=78:ts=8:ft=help:norl:
