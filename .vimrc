@@ -1,3 +1,16 @@
+call pathogen#infect()
+call pathogen#helptags()         
+" for Sysntastic
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+
 :filetype plugin on
 :syntax on
 :set number
@@ -60,6 +73,7 @@ vnoremap <Leader>s :sort<CR>
 vnoremap < <gv  "better indentation
 vnoremap > >gv  "better indentation
 map <Leader>a ggVG  "select all
+map <Leader>nt :NERDTree
 
 " Fixing the copy & paste madness
 " ================================
