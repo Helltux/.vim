@@ -1,4 +1,4 @@
 To install this:
-cd
-git clone https://github.com/helltux/.vim
-ln -s .vim/vimrc .vimrc
+1. cd
+2. git clone https://github.com/helltux/.vim
+3. ln -s .vim/vimrc .vimrc
