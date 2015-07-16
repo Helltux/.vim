@@ -1,0 +1,9 @@
+" Ctrl-a
+inoremap <C-a> <C-Home><C-S-End>
+" Speed up j and k
+noremap j 4j
+noremap k 4k
+
+"Quiker tab switch
+noremap <C-h> gT
+noremap <C-l> gt
