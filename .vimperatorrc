@@ -7,3 +7,10 @@ noremap k 4k
 "Quiker tab switch
 noremap <C-h> gT
 noremap <C-l> gt
+
+"Quiker histor 
+map <A-o> <C-o>
+map <A-i> <C-i>
+
+comm! yt 'exe "!" + eval("plugins.youtubeDownload.youtubeDownload()")'
+set hintchars=qwertzuiop
